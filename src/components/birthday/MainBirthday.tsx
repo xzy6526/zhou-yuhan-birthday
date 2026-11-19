@@ -29,6 +29,7 @@ const BirthdayCover = lazy(() => import("./BirthdayCover"));
 
 export const MainBirthday = () => {
     const [visible, setVisible] = useState(false);
+    const [cakeEntered, setCakeEntered] = useState(false);
     const [emojis, setEmojis] = useState<{
         id: number;
         emoji: string;
@@ -104,10 +105,13 @@ export const MainBirthday = () => {
     }, []);
     useEffect(() => {
         setBgVolume(0.4);
-        setTimeout(() => setVisible(true), 100);
-        setTimeout(() => { playBoom(); }, 600);
-        setTimeout(() => { playReveal(); }, 1200);
-        setTimeout(() => { fireCannon(); playBoom(); }, 2000);
+        const timers = [
+            setTimeout(() => setVisible(true), 100),
+            setTimeout(playBoom, 600),
+            setTimeout(playReveal, 1200),
+            setTimeout(() => { fireCannon(); playBoom(); }, 2000),
+        ];
+        return () => timers.forEach(timer => clearTimeout(timer));
     }, [playReveal, playBoom, setBgVolume, fireCannon]);
     const addEmoji = () => {
         if (typeof navigator !== 'undefined' && navigator.vibrate)
@@ -235,15 +239,17 @@ export const MainBirthday = () => {
       
 
       {config.showCakeSection && (<section id="cake-section" className="relative z-20 px-4 pb-16 sm:pb-32">
-        <motion.div initial={{ opacity: 0, y: 100 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "0px" }} transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }} className="text-center">
+        <motion.div initial={{ opacity: 0, y: 100 }} whileInView={{ opacity: 1, y: 0 }} onViewportEnter={() => setCakeEntered(true)} viewport={{ once: true, margin: "0px" }} transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }} className="text-center">
           {name === "周昱含" ? (
-            <iframe
-              src={import.meta.env.BASE_URL + "cake/birthday-cake-demo.html"}
-              title="周昱含的互动生日蛋糕"
-              loading="lazy"
-              sandbox="allow-scripts"
-              className="mx-auto block h-[clamp(500px,70svh,680px)] w-full max-w-5xl rounded-3xl border border-white/15 bg-[#080713] shadow-2xl"
-            />
+            <div className="h-[clamp(500px,70svh,680px)]">
+              {cakeEntered && <iframe
+                src={import.meta.env.BASE_URL + "cake/birthday-cake-demo.html"}
+                title="周昱含的互动生日蛋糕"
+                loading="lazy"
+                sandbox="allow-scripts"
+                className="mx-auto block h-full w-full max-w-5xl rounded-3xl border border-white/15 bg-[#080713] shadow-2xl"
+              />}
+            </div>
           ) : <CakeCutting />}
         </motion.div>
       </section>)}

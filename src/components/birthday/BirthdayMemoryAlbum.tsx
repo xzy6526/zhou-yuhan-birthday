@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, Pause, Play, X } from "lucide-react";
 import type { MemoryAlbumData } from "@/config/localMemoryAlbum";
 import "./BirthdayMemoryAlbum.css";
@@ -53,27 +53,14 @@ const MemoryWall = ({ featured }: { featured: string[] }) => {
     );
 };
 
-const BirthdayMemoryAlbum = ({ album }: { album: MemoryAlbumData }) => {
-    const dialogRef = useRef<HTMLDialogElement>(null);
-    const [current, setCurrent] = useState<number | null>(null);
-    const photos = album.groups.flatMap(group => group.photos);
-    const active = current === null ? null : photos[current];
-
-    const step = (direction: number) => {
-        setCurrent(index => index === null ? null : (index + direction + photos.length) % photos.length);
-    };
-
+const AlbumGrid = memo(function AlbumGrid({ album, onOpen }: { album: MemoryAlbumData; onOpen: (index: number) => void }) {
+    let offset = 0;
     return (
-        <section id="memories" className="memory-album relative z-20 mx-auto max-w-6xl px-4 py-16 sm:px-8" aria-labelledby="memory-album-title">
-            <header className="memory-album__intro">
-                <h2 id="memory-album-title">照片里的日子</h2>
-                <a href="#memory-photos">浏览全部 {photos.length} 张 <span aria-hidden="true">↓</span></a>
-            </header>
-
-            <MemoryWall featured={album.featured} />
-
-            <div id="memory-photos" className="memory-album__groups">
-                {album.groups.map(group => (
+        <div id="memory-photos" className="memory-album__groups">
+            {album.groups.map(group => {
+                const start = offset;
+                offset += group.photos.length;
+                return (
                     <div className="memory-album__group" data-layout={group.layout} key={group.title}>
                         <h3>{group.title}</h3>
                         <div className="memory-album__grid">
@@ -82,10 +69,7 @@ const BirthdayMemoryAlbum = ({ album }: { album: MemoryAlbumData }) => {
                                     <button
                                         type="button"
                                         aria-label={`查看${group.title}第${i + 1}张照片`}
-                                        onClick={() => {
-                                            setCurrent(photos.indexOf(photo));
-                                            dialogRef.current?.showModal();
-                                        }}
+                                        onClick={() => onOpen(start + i)}
                                     >
                                         <img
                                             src={asset(photo.id, true)}
@@ -101,8 +85,36 @@ const BirthdayMemoryAlbum = ({ album }: { album: MemoryAlbumData }) => {
                             ))}
                         </div>
                     </div>
-                ))}
-            </div>
+                );
+            })}
+        </div>
+    );
+});
+
+const BirthdayMemoryAlbum = ({ album }: { album: MemoryAlbumData }) => {
+    const dialogRef = useRef<HTMLDialogElement>(null);
+    const [current, setCurrent] = useState<number | null>(null);
+    const photos = useMemo(() => album.groups.flatMap(group => group.photos), [album.groups]);
+    const openPhoto = useCallback((index: number) => {
+        setCurrent(index);
+        dialogRef.current?.showModal();
+    }, []);
+    const active = current === null ? null : photos[current];
+
+    const step = (direction: number) => {
+        setCurrent(index => index === null ? null : (index + direction + photos.length) % photos.length);
+    };
+
+    return (
+        <section id="memories" className="memory-album relative z-20 mx-auto max-w-6xl px-4 py-16 sm:px-8" aria-labelledby="memory-album-title">
+            <header className="memory-album__intro">
+                <h2 id="memory-album-title">照片里的日子</h2>
+                <a href="#memory-photos">浏览全部 {photos.length} 张 <span aria-hidden="true">↓</span></a>
+            </header>
+
+            <MemoryWall featured={album.featured} />
+
+            <AlbumGrid album={album} onOpen={openPhoto} />
 
             <dialog
                 ref={dialogRef}
