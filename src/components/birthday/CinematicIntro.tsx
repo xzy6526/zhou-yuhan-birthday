@@ -13,6 +13,7 @@ import { useTranslation } from "@/i18n";
 import { HighlightedText } from "./HighlightedText";
 import { EnvelopeLetterScene } from "./EnvelopeLetterScene";
 import { Heart } from "lucide-react";
+import nebula from "@/assets/birthday/cover-nebula.webp";
 
 interface CinematicIntroProps {
     onComplete: () => void;
@@ -555,12 +556,26 @@ export const CinematicIntro = ({ onComplete }: CinematicIntroProps) => {
             className={`fixed inset-0 z-40 flex items-center justify-center transition-all duration-1000 overflow-hidden ${
                 fadeOut ? "opacity-0" : "opacity-100"
             } ${shaking ? "animate-screen-shake" : ""}`}
-            style={{ background: 'transparent' }}
         >
-            {/* Dreamy Ambient Bokeh Auras (GPU-optimized multi-stop radial gradients) */}
-            <div className="absolute top-[8%] left-[12%] w-[32rem] h-[32rem] rounded-full bg-[radial-gradient(circle,rgba(255,75,130,0.18)_0%,rgba(255,75,130,0.08)_40%,transparent_70%)] pointer-events-none animate-subtle-float" />
-            <div className="absolute top-[18%] right-[12%] w-[30rem] h-[30rem] rounded-full bg-[radial-gradient(circle,rgba(255,200,100,0.14)_0%,rgba(255,200,100,0.05)_40%,transparent_70%)] pointer-events-none animate-pulse" />
-            <div className="absolute bottom-[10%] left-[25%] w-[36rem] h-[36rem] rounded-full bg-[radial-gradient(circle,rgba(180,60,140,0.16)_0%,rgba(180,60,140,0.06)_40%,transparent_70%)] pointer-events-none" />
+            {name === "周昱含" ? (
+                <div
+                    aria-hidden="true"
+                    className="absolute inset-0 pointer-events-none"
+                    style={{
+                        backgroundColor: "#161429",
+                        backgroundImage: `radial-gradient(ellipse at center, #17142e68 8%, transparent 72%), url("${nebula}")`,
+                        backgroundPosition: "center",
+                        backgroundSize: "cover",
+                        opacity: 0.88,
+                    }}
+                />
+            ) : (
+                <>
+                    <div className="absolute top-[8%] left-[12%] w-[32rem] h-[32rem] rounded-full bg-[radial-gradient(circle,rgba(255,75,130,0.18)_0%,rgba(255,75,130,0.08)_40%,transparent_70%)] pointer-events-none animate-subtle-float" />
+                    <div className="absolute top-[18%] right-[12%] w-[30rem] h-[30rem] rounded-full bg-[radial-gradient(circle,rgba(255,200,100,0.14)_0%,rgba(255,200,100,0.05)_40%,transparent_70%)] pointer-events-none animate-pulse" />
+                    <div className="absolute bottom-[10%] left-[25%] w-[36rem] h-[36rem] rounded-full bg-[radial-gradient(circle,rgba(180,60,140,0.16)_0%,rgba(180,60,140,0.06)_40%,transparent_70%)] pointer-events-none" />
+                </>
+            )}
 
             <AnimatePresence mode="wait">
                 {scene === "storytelling" && (
