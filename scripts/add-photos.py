@@ -30,7 +30,11 @@ def add_photos(root, sources, group_title):
         groups = {group["title"]: group for group in album["groups"]}
         if group_title not in groups:
             raise ValueError("请选择已有分组：" + "、".join(groups))
-        known = {p.get("sourceSha256") for g in groups.values() for p in g["photos"]}
+        known = set()
+        for group in groups.values():
+            for photo in group["photos"]:
+                known.add(photo.get("sourceSha256"))
+                known.update(photo.get("duplicateSourceSha256", []))
         files = []
         for source in sources:
             if source.is_dir():
