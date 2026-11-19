@@ -2,12 +2,13 @@ import { useState, useCallback } from "react";
 import { Volume2, VolumeX } from "lucide-react";
 import { motion } from "framer-motion";
 import { useSoundManager } from "./SoundManager";
+import { AUDIO_ASSETS } from "@/config/birthday";
 import { useTranslation } from "@/i18n";
 
 export const SoundToggle = () => {
     const [isMuted, setIsMuted] = useState(false);
     const { setBgVolume, setMuted } = useSoundManager();
-    const { isFrench, isBengali, isHindi } = useTranslation();
+    const { isFrench, isBengali, isHindi, isChinese } = useTranslation();
 
     const handleToggle = useCallback(() => {
         setIsMuted((prev) => {
@@ -18,15 +19,17 @@ export const SoundToggle = () => {
         });
     }, [setBgVolume, setMuted]);
 
+    if (AUDIO_ASSETS.bgmUrl === "off" && !AUDIO_ASSETS.soundEffectsEnabled) return null;
+
     const label = isMuted
-        ? isFrench
+        ? isChinese ? "打开声音" : isFrench
             ? "Activer le son"
             : isBengali
             ? "শব্দ চালু করুন"
             : isHindi
             ? "आवाज़ चालू करें"
             : "Unmute Audio"
-        : isFrench
+        : isChinese ? "关闭声音" : isFrench
         ? "Couper le son"
         : isBengali
         ? "শব্দ বন্ধ করুন"

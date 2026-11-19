@@ -5,9 +5,9 @@ import { useTranslation } from '@/i18n';
 
 export const SpecialMessage = () => {
     const { customMessage, name, relationship, gender } = useBirthdayStore(state => state.config);
-    const { isHindi, isBengali, isFrench } = useTranslation();
+    const { isHindi, isBengali, isFrench, isChinese } = useTranslation();
     const variants = useStoryVariants();
-    const defaultWords = isFrench
+    const defaultWords = isChinese ? ['祝你今天开心，新的一岁也开心。'] : isFrench
         ? ['Nous', 'vous', 'souhaitons', 'la', 'plus', 'merveilleuse', 'des', 'journées', '!']
         : isBengali
             ? ['আপনার', 'জন্য', 'এই', 'দিনটি', 'পৃথিবীর', 'সবচেয়ে', 'সুন্দর', 'ও', 'আনন্দময়', 'হোক!']
@@ -20,7 +20,7 @@ export const SpecialMessage = () => {
     const typographyClass = relationship === 'partner' ? 'font-serif tracking-widest text-white/90 italic' :
         relationship === 'friend' ? 'font-sans font-black uppercase text-white tracking-tight italic' :
             'font-sans font-medium text-white/80';
-    const salutation = isFrench
+    const salutation = isChinese ? '给' + (name || '今天的寿星') : isFrench
         ? (relationship === 'partner'
             ? (isMale ? 'Pour mon tendre prince,' : isFemale ? 'Pour ma tendre reine,' : 'Pour tout mon univers,')
             : relationship === 'friend'

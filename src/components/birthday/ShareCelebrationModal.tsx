@@ -24,7 +24,7 @@ interface ShareCelebrationModalProps {
 
 export const ShareCelebrationModal: React.FC<ShareCelebrationModalProps> = ({ isOpen, onClose }) => {
   const { config } = useBirthdayStore();
-  const { language, isBengali, isHindi, isFrench } = useTranslation();
+  const { language, isBengali, isHindi, isFrench, isChinese } = useTranslation();
   
   const [customName, setCustomName] = useState(config.name || '');
   const [customRel, setCustomRel] = useState<RelationshipType>(config.relationship || 'partner');
@@ -74,7 +74,7 @@ export const ShareCelebrationModal: React.FC<ShareCelebrationModalProps> = ({ is
 
   const targetName = activeTab === 'customize' ? customName : (config.name || '');
   
-  const shareText = targetName
+  const shareText = isChinese ? (targetName ? targetName + "，生日快乐！" : "一起打开这份生日祝福。") : targetName
     ? (isFrench 
         ? `✨ Venez célébrer l'anniversaire magique de ${targetName} sur Birthday Bloom ! 🎂🎉`
         : isBengali
@@ -188,7 +188,7 @@ export const ShareCelebrationModal: React.FC<ShareCelebrationModalProps> = ({ is
           <button
             type="button"
             onClick={onClose}
-            aria-label="Close modal"
+            aria-label={isChinese ? "关闭分享窗口" : "Close modal"}
             className="absolute top-5 right-5 rounded-full p-2 text-white/50 hover:text-white hover:bg-white/10 transition-colors"
           >
             <X size={20} />
@@ -200,11 +200,11 @@ export const ShareCelebrationModal: React.FC<ShareCelebrationModalProps> = ({ is
               <Share2 className="text-primary" size={28} />
             </div>
             <h3 id="share-modal-title" className="font-display text-2xl sm:text-3xl font-black text-white">
-              {isFrench ? "Partager la Célébration ✨" : isBengali ? "উদযাপন শেয়ার করুন ✨" : isHindi ? "जश्न शेयर करें ✨" : "Share Celebration ✨"}
+              {isChinese ? "分享生日祝福" : isFrench ? "Partager la Célébration ✨" : isBengali ? "উদযাপন শেয়ার করুন ✨" : isHindi ? "जश्न शेयर करें ✨" : "Share Celebration ✨"}
             </h3>
             <p className="text-white/60 text-xs sm:text-sm mt-1">
-              {isFrench 
-                ? "Envoyez cette surprise magique ou créez-en une nouvelle pour vos proches"
+              {isChinese ? "复制这一页的链接。"
+                : isFrench ? "Envoyez cette surprise magique ou créez-en une nouvelle pour vos proches"
                 : isBengali
                   ? "এই জাদুকরী সারপ্রাইজটি পাঠান বা প্রিয়জনের জন্য নতুন তৈরি করুন"
                   : isHindi
@@ -225,7 +225,7 @@ export const ShareCelebrationModal: React.FC<ShareCelebrationModalProps> = ({ is
               }`}
             >
               <Send size={14} />
-              {isFrench ? "Partager Maintenant" : isBengali ? "এখনই শেয়ার করুন" : isHindi ? "अभी शेयर करें" : "Quick Share"}
+              {isChinese ? "分享当前页面" : isFrench ? "Partager Maintenant" : isBengali ? "এখনই শেয়ার করুন" : isHindi ? "अभी शेयर करें" : "Quick Share"}
             </button>
             <button
               type="button"
@@ -237,7 +237,7 @@ export const ShareCelebrationModal: React.FC<ShareCelebrationModalProps> = ({ is
               }`}
             >
               <Sparkles size={14} />
-              {isFrench ? "Créer pour Quelqu'un" : isBengali ? "নতুন তৈরি করুন" : isHindi ? "नया बनाएं" : "Customize Surprise"}
+              {isChinese ? "设置分享信息" : isFrench ? "Créer pour Quelqu'un" : isBengali ? "নতুন তৈরি করুন" : isHindi ? "नया बनाएं" : "Customize Surprise"}
             </button>
           </div>
 
@@ -246,7 +246,7 @@ export const ShareCelebrationModal: React.FC<ShareCelebrationModalProps> = ({ is
             <div className="space-y-4 mb-6 text-left">
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-wider text-white/70 mb-1.5">
-                  {isFrench ? "Nom du Destinataire" : isBengali ? "যার জন্মদিন (নাম)" : isHindi ? "जिसका जन्मदिन है (नाम)" : "Recipient Name"}
+                  {isChinese ? "收件人" : isFrench ? "Nom du Destinataire" : isBengali ? "যার জন্মদিন (নাম)" : isHindi ? "जिसका जन्मदिन है (नाम)" : "Recipient Name"}
                 </label>
                 <input
                   type="text"
@@ -260,7 +260,7 @@ export const ShareCelebrationModal: React.FC<ShareCelebrationModalProps> = ({ is
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-wider text-white/70 mb-1.5">
-                    {isFrench ? "Relation" : isBengali ? "সম্পর্ক" : isHindi ? "रिश्ता" : "Relationship"}
+                    {isChinese ? "关系" : isFrench ? "Relation" : isBengali ? "সম্পর্ক" : isHindi ? "रिश्ता" : "Relationship"}
                   </label>
                   <select
                     value={customRel}
@@ -283,7 +283,7 @@ export const ShareCelebrationModal: React.FC<ShareCelebrationModalProps> = ({ is
 
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-wider text-white/70 mb-1.5">
-                    {isFrench ? "Langue" : isBengali ? "ভাষা" : isHindi ? "भाषा" : "Language"}
+                    {isChinese ? "语言" : isFrench ? "Langue" : isBengali ? "ভাষা" : isHindi ? "भाषा" : "Language"}
                   </label>
                   <select
                     value={customLang}
@@ -294,13 +294,14 @@ export const ShareCelebrationModal: React.FC<ShareCelebrationModalProps> = ({ is
                     <option value="bn">বাংলা (Bengali)</option>
                     <option value="hi">हिन्दी (Hindi)</option>
                     <option value="fr">Français (French)</option>
+                    <option value="zh">简体中文</option>
                   </select>
                 </div>
               </div>
 
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-wider text-white/70 mb-1.5">
-                  {isFrench ? "Votre Nom (Expéditeur)" : isBengali ? "আপনার নাম (শুভেচ্ছক)" : isHindi ? "आपका नाम (शुभचिंतक)" : "Your Name (Optional)"}
+                  {isChinese ? "你的名字（可选）" : isFrench ? "Votre Nom (Expéditeur)" : isBengali ? "আপনার নাম (শুভেচ্ছক)" : isHindi ? "आपका नाम (शुभचिंतक)" : "Your Name (Optional)"}
                 </label>
                 <input
                   type="text"
@@ -371,18 +372,18 @@ export const ShareCelebrationModal: React.FC<ShareCelebrationModalProps> = ({ is
             <input
               type="text"
               readOnly
-              aria-label="Celebration Share URL"
+              aria-label={isChinese ? "生日页链接" : "Celebration Share URL"}
               value={activeShareUrl}
               className="flex-1 bg-transparent px-3 text-xs text-white/80 select-all outline-none truncate font-mono"
             />
             <button
               type="button"
               onClick={handleCopyLink}
-              aria-label="Copy share link"
+              aria-label={isChinese ? "复制链接" : "Copy share link"}
               className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-xs font-bold text-black transition-all hover:brightness-110 active:scale-95"
             >
               {copied ? <Check size={14} /> : <Copy size={14} />}
-              {copied ? "Copied!" : "Copy"}
+              {copied ? (isChinese ? "已复制" : "Copied!") : (isChinese ? "复制" : "Copy")}
             </button>
           </div>
 
@@ -394,7 +395,7 @@ export const ShareCelebrationModal: React.FC<ShareCelebrationModalProps> = ({ is
               className="w-full py-3 rounded-2xl border border-white/20 bg-white/10 hover:bg-white/15 text-white text-xs sm:text-sm font-semibold transition-all flex items-center justify-center gap-2"
             >
               <Share2 size={16} />
-              {isFrench ? "Partager via les Applications" : isBengali ? "অন্যান্য অ্যাপে শেয়ার করুন" : isHindi ? "अन्य ऐप्स में शेयर करें" : "More Sharing Options"}
+              {isChinese ? "通过其他应用分享" : isFrench ? "Partager via les Applications" : isBengali ? "অন্যান্য অ্যাপে শেয়ার করুন" : isHindi ? "अन्य ऐप्स में शेयर करें" : "More Sharing Options"}
             </button>
           )}
 

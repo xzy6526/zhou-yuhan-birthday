@@ -21,7 +21,7 @@ export const BalloonPopGame = () => {
     const { config } = useBirthdayStore();
     const { playPop, playReveal, playBoom } = useSoundManager();
     const { fireConfetti } = useConfetti();
-    const { isHindi, isBengali, isFrench } = useTranslation();
+    const { isHindi, isBengali, isFrench, isChinese } = useTranslation();
     const isMobile = useIsMobile();
 
     const relationship = config.relationship || "partner";
@@ -29,6 +29,7 @@ export const BalloonPopGame = () => {
 
     // 4 words for 4 balloons customized to relationship and language
     const words = useMemo(() => {
+        if (isChinese) return ["祝你", "生日", "快乐", "🎉"];
         if (isFrench) {
             if (relationship === "partner") return ["Tu", "es", "mon", "tout ! 💖"];
             if (relationship === "friend") return ["Tu", "es", "une", "légende ! 🚀"];
@@ -70,7 +71,7 @@ export const BalloonPopGame = () => {
         if (relationship === "grandfather" || relationship === "grandmother") return ["You", "are", "our", "pride! 🏅🌟"];
         if (relationship === "mentor" || relationship === "colleague") return ["You", "are", "an", "inspiration! 🎯✨"];
         return ["You", "are", "our", "treasure! 🌟💝"];
-    }, [relationship, isHindi, isBengali, isFrench]);
+    }, [relationship, isHindi, isBengali, isFrench, isChinese]);
 
     const initialBalloons: BalloonItem[] = useMemo(() => [
         { id: 0, color: "#FF4D6D", lightColor: "#FFAAA6", word: words[0] || "You", isPopped: false, xOffset: -12, delay: 0 },
@@ -163,8 +164,8 @@ export const BalloonPopGame = () => {
                 >
                     <PartyPopper size={20} className="text-primary animate-bounce" />
                     <span>
-                        {isFrench
-                            ? "Éclatez les ballons ! 🎈"
+                        {isChinese ? "戳气球"
+                            : isFrench ? "Éclatez les ballons ! 🎈"
                             : isBengali
                                 ? "বেলুনগুলো ফাটান! 🎈"
                                 : isHindi
@@ -174,8 +175,8 @@ export const BalloonPopGame = () => {
                 </motion.div>
 
                 <p className="font-display italic text-lg sm:text-2xl text-foreground/80">
-                    {isFrench
-                        ? "Touchez chaque ballon pour révéler le message secret 💌"
+                    {isChinese ? "戳开气球，看看藏着什么话。"
+                        : isFrench ? "Touchez chaque ballon pour révéler le message secret 💌"
                         : isBengali
                             ? "গোপন বার্তাটি দেখতে প্রতিটি বেলুনে স্পর্শ করুন 💌"
                             : isHindi
@@ -220,7 +221,7 @@ export const BalloonPopGame = () => {
                                         }}
                                         role="button"
                                         tabIndex={0}
-                                        aria-label={`Pop balloon ${balloon.id + 1}`}
+                                        aria-label={isChinese ? ("戳破气球 " + (balloon.id + 1)) : `Pop balloon ${balloon.id + 1}`}
                                         className="cursor-pointer flex flex-col items-center group touch-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-full"
                                     >
                                         {/* Balloon Bulb */}
@@ -277,8 +278,8 @@ export const BalloonPopGame = () => {
                     >
                         <RotateCcw size={16} />
                         <span>
-                            {isFrench
-                                ? "Rejouer 🎈"
+                            {isChinese ? "再玩一次"
+                                : isFrench ? "Rejouer 🎈"
                                 : isBengali
                                     ? "আবার খেলুন 🎈"
                                     : isHindi

@@ -42,7 +42,7 @@ export const CinematicIntro = ({ onComplete }: CinematicIntroProps) => {
     const { fireConfetti, fireStars, fireCinematicCelebration } = useConfetti();
     const { playType, playWhoosh, playReveal, playPop, playBoom } = useSoundManager();
     const { config, getAnimationPacing } = useBirthdayStore();
-    const { t, isHindi, isBengali, isFrench } = useTranslation();
+    const { t, isHindi, isBengali, isFrench, isChinese } = useTranslation();
     const { name, age, relationship, favoriteColor, gender } = config;
 
     const pacing = getAnimationPacing();
@@ -122,6 +122,7 @@ export const CinematicIntro = ({ onComplete }: CinematicIntroProps) => {
     const storyLines = useMemo(() => {
         const isMale = gender === 'male';
         const isFemale = gender === 'female';
+        if (isChinese) return ['有些日子，值得停下来好好过。', '比如今天。', '因为今天，是{name}的生日。'.replace('{name}', name || '你')];
         if (isFrench) {
             if (relationship === 'partner') {
                 return [
@@ -228,9 +229,10 @@ export const CinematicIntro = ({ onComplete }: CinematicIntroProps) => {
             "I wanted to build something that lasts as long as our *treasured memories*...",
             "So, sit back, relax, and *enjoy your celebration*! ✨"
         ];
-    }, [relationship, gender, isHindi, isBengali, isFrench]);
+    }, [name, relationship, gender, isHindi, isBengali, isFrench, isChinese]);
 
     const postChatLines = useMemo(() => {
+        if (isChinese) return ['今天的第一句祝福，先送给你。', '还有一封信，等你打开。'];
         if (isFrench) {
             if (relationship === 'friend')
                 return [
@@ -317,9 +319,10 @@ export const CinematicIntro = ({ onComplete }: CinematicIntroProps) => {
             "We put our whole hearts into this, just for you...",
             "Let the *celebration begin*! ✨",
         ];
-    }, [relationship, isHindi, isBengali, isFrench]);
+    }, [relationship, isHindi, isBengali, isFrench, isChinese]);
 
     const finalLines = useMemo(() => {
+        if (isChinese) return ['愿新的一岁，有很多发自内心的笑。', '想做的事，慢慢做也来得及。', (name || '今天的寿星') + '，生日快乐！'];
         if (isFrench) {
             if (relationship === 'partner')
                 return [
@@ -406,11 +409,11 @@ export const CinematicIntro = ({ onComplete }: CinematicIntroProps) => {
             "May your kindness always come back to you *tenfold* ✨",
             "We *love you* so much! 💖"
         ];
-    }, [name, relationship, isHindi, isBengali, isFrench, t]);
+    }, [name, relationship, isHindi, isBengali, isFrench, isChinese, t]);
 
     const effectiveStoryLines = useMemo(() => {
         if (!age) return storyLines;
-        const ageLine = isFrench
+        const ageLine = isChinese ? age + " 岁快乐！" : isFrench
             ? `Alors que vous célébrez votre *${age}e année* de pure splendeur... ✨`
             : isBengali
                 ? `আপনার জীবনের *${age}-তম বছর* উদযাপন করতে করতে... ✨`
@@ -418,7 +421,7 @@ export const CinematicIntro = ({ onComplete }: CinematicIntroProps) => {
                     ? `आपके जीवन के *${age}वें खूबसूरत साल* का जश्न मनाते हुए... ✨`
                     : `As you celebrate your *${age}th magical year*... ✨`;
         return [...storyLines.slice(0, -1), ageLine, storyLines[storyLines.length - 1]];
-    }, [age, storyLines, isHindi, isBengali, isFrench]);
+    }, [age, storyLines, isHindi, isBengali, isFrench, isChinese]);
 
     const primaryColor = favoriteColor || '#FF2A6D';
 
@@ -743,7 +746,7 @@ export const CinematicIntro = ({ onComplete }: CinematicIntroProps) => {
                                     </span>
                                 </h1>
                                 <h2 className="font-script text-6xl sm:text-8xl md:text-9xl lg:text-[12rem] font-bold text-gradient-romantic text-glow-rose mt-4 break-words">
-                                    {name}!
+                                    {name}{isChinese ? "！" : "!"}
                                 </h2>
                             </div>
                         )}

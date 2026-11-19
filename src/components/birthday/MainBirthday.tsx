@@ -38,7 +38,7 @@ export const MainBirthday = () => {
     const { fireConfetti, fireCannon, fireStars } = useConfetti();
     const { playReveal, playPop, playBoom, setBgVolume } = useSoundManager();
     const { config } = useBirthdayStore();
-    const { t, isHindi, isBengali, isFrench } = useTranslation();
+    const { t, isHindi, isBengali, isFrench, isChinese } = useTranslation();
     const { name, age, relationship, favoriteColor, senderName } = config;
     const isMobile = useIsMobile();
     const reduceMotion = useReducedMotion();
@@ -186,7 +186,7 @@ export const MainBirthday = () => {
         <motion.h1 variants={itemVariants} className="font-display text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black mb-2 break-words leading-tight px-2">
           <span className="bg-gradient-to-r from-[var(--color-primary)] via-[hsl(45,100%,75%)] to-[hsl(200,80%,70%)] bg-clip-text text-transparent animate-gradient-shift drop-shadow-[0_4px_30px_rgba(255,255,255,0.3)]">
             {age
-              ? (!isHindi && !isBengali && !isFrench
+              ? (!isHindi && !isBengali && !isFrench && !isChinese
                   ? `Happy ${age}${age % 100 >= 11 && age % 100 <= 13 ? 'th' : age % 10 === 1 ? 'st' : age % 10 === 2 ? 'nd' : age % 10 === 3 ? 'rd' : 'th'} Birthday`
                   : t('common.happyNthBirthday', { age }))
               : t('common.happyBirthday')}
@@ -194,7 +194,7 @@ export const MainBirthday = () => {
         </motion.h1>
 
         <motion.h2 variants={itemVariants} className="font-display text-5xl sm:text-6xl md:text-8xl lg:text-9xl font-black text-foreground animate-glow-pulse mb-5 break-words leading-none px-2">
-          <TypeWriter text={`${name}!`} speed={120} delay={1500} cursor={false}/>
+          <TypeWriter text={isChinese ? name : `${name}!`} speed={120} delay={1500} cursor={false}/>
         </motion.h2>
 
         {/* Env-Driven Personalization & Interests Pill Strip */}
@@ -224,16 +224,24 @@ export const MainBirthday = () => {
       
       
 
+      {config.showCakeSection && (<section id="cake-section" className="relative z-20 px-4 pb-16 sm:pb-32">
+        <motion.div initial={{ opacity: 0, y: 100 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "0px" }} transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }} className="text-center">
+          {name === "周昱含" ? (
+            <iframe
+              src={import.meta.env.BASE_URL + "cake/birthday-cake-demo.html"}
+              title="周昱含的互动生日蛋糕"
+              loading="lazy"
+              sandbox="allow-scripts"
+              className="mx-auto block h-[clamp(500px,70svh,680px)] w-full max-w-5xl rounded-3xl border border-white/15 bg-[#080713] shadow-2xl"
+            />
+          ) : <CakeCutting />}
+        </motion.div>
+      </section>)}
+
       {config.showPhotoSection && <PhotoGallery />}
 
       {/* Interactive Pop The Balloons Mini-Game */}
       <BalloonPopGame />
-
-      {config.showCakeSection && (<section id="cake-section" className="relative z-20 px-4 pb-16 sm:pb-32">
-        <motion.div initial={{ opacity: 0, y: 100 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "0px" }} transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }} className="text-center">
-          <CakeCutting />
-        </motion.div>
-      </section>)}
 
       {/* Interactive 3D Opening Envelope & Love Letter Section */}
       <section className="relative z-20 flex justify-center px-4 pb-32 pt-8">
@@ -326,11 +334,11 @@ export const MainBirthday = () => {
       {/* Interactive Celebration Buttons */}
       <section className="relative z-20 flex flex-wrap justify-center gap-4 sm:gap-6 px-4 pb-32">
         {[
-            { label: isFrench ? "🎊 Canon !" : isBengali ? "🎊 কামান!" : isHindi ? "🎊 तोप!" : "🎊 Cannon!", color: primaryColor, action: fireCannon },
-            { label: isFrench ? "🎈 Fête !" : isBengali ? "🎈 পার্টি!" : isHindi ? "🎈 पार्टी!" : "🎈 Party!", color: "hsl(45, 100%, 50%)", action: fireConfetti },
-            { label: isFrench ? "💫 Amour !" : isBengali ? "💫 ভালোবাসা!" : isHindi ? "💫 प्यार!" : "💫 Love!", color: "hsl(200, 80%, 50%)", action: () => { for (let i = 0; i < 5; i++)
+            { label: isChinese ? "🎊 放礼花" : isFrench ? "🎊 Canon !" : isBengali ? "🎊 কামান!" : isHindi ? "🎊 तोप!" : "🎊 Cannon!", color: primaryColor, action: fireCannon },
+            { label: isChinese ? "🎈 撒彩纸" : isFrench ? "🎈 Fête !" : isBengali ? "🎈 পার্টি!" : isHindi ? "🎈 पार्टी!" : "🎈 Party!", color: "hsl(45, 100%, 50%)", action: fireConfetti },
+            { label: isChinese ? "💫 送祝福" : isFrench ? "💫 Amour !" : isBengali ? "💫 ভালোবাসা!" : isHindi ? "💫 प्यार!" : "💫 Love!", color: "hsl(200, 80%, 50%)", action: () => { for (let i = 0; i < 5; i++)
                     setTimeout(addEmoji, i * 200); } },
-            { label: isFrench ? "💌 Partager !" : isBengali ? "💌 শেয়ার!" : isHindi ? "💌 शेयर!" : "💌 Share!", color: "hsl(320, 85%, 55%)", action: () => setShareOpen(true) }
+            { label: isChinese ? "💌 分享" : isFrench ? "💌 Partager !" : isBengali ? "💌 শেয়ার!" : isHindi ? "💌 शेयर!" : "💌 Share!", color: "hsl(320, 85%, 55%)", action: () => setShareOpen(true) }
         ].map((btn, i) => (<motion.button key={i} whileHover={shouldAnimate ? { scale: 1.08, y: -4 } : undefined} whileTap={{ scale: 0.94 }} onClick={() => { btn.action(); addEmoji(); }} className="px-8 sm:px-12 py-4 sm:py-6 rounded-full text-lg sm:text-2xl font-black text-white shadow-2xl transition-all border border-white/20 backdrop-blur-xl" style={{
                 background: `linear-gradient(135deg, ${btn.color}cc, ${btn.color}88)`,
                 boxShadow: `0 15px 40px -10px ${btn.color}50, inset 0 1px 0 rgba(255,255,255,0.4)`
@@ -355,12 +363,12 @@ export const MainBirthday = () => {
             className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 text-white/90 text-xs sm:text-sm font-semibold tracking-wider transition-all duration-300 shadow-xl hover:scale-105"
           >
             <Share2 size={16} className="text-primary" />
-            <span>{isFrench ? "Partager ou Créer une Surprise ✨" : isBengali ? "সারপ্রাইজ শেয়ার বা নতুন তৈরি করুন ✨" : isHindi ? "सरप्राइज शेयर करें या नया बनाएं ✨" : "Share Surprise or Create Yours ✨"}</span>
+            <span>{isChinese ? "分享这份生日祝福" : isFrench ? "Partager ou Créer une Surprise ✨" : isBengali ? "সারপ্রাইজ শেয়ার বা নতুন তৈরি করুন ✨" : isHindi ? "सरप्राइज शेयर करें या नया बनाएं ✨" : "Share Surprise or Create Yours ✨"}</span>
           </button>
         </div>
         <p className="text-white/30 text-sm tracking-[0.15em]">
-          {isFrench ? "Avec amour de" : isBengali ? "ভালোবাসায়" : isHindi ? "प्यार से" : "With love from"}{' '}
-          <span className="text-white/50 font-semibold">{senderName || 'Someone Special'}</span>
+          {isChinese ? "把最好的祝福送给你" : isFrench ? "Avec amour de" : isBengali ? "ভালোবাসায়" : isHindi ? "प्यार से" : "With love from"}{' '}
+          <span className="text-white/50 font-semibold">{senderName || (isChinese ? '' : 'Someone Special')}</span>
         </p>
         <p className="mt-2 text-white/10 text-[10px] tracking-[0.3em] uppercase">
           Birthday Bloom ✨

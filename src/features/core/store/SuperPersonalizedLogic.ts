@@ -58,7 +58,15 @@ export const getHighlySpecificLetter = (
     senderName?: string
 ): string => {
     const lang = normalizeLanguage(language);
-    const catalog = LETTER_CATALOG[lang] || EMOTIONAL_LETTERS;
+    if (lang === 'zh') {
+        return [
+            `${name}，生日快乐！`,
+            '愿你新的一岁，能常和喜欢的人见面，也有时间做喜欢的事。',
+            '今天，记得给自己切一块大大的蛋糕。',
+            senderName?.trim(),
+        ].filter(Boolean).join('\n\n');
+    }
+    const catalog = LETTER_CATALOG[lang];
     const letter = resolveLetterTemplate(catalog, relationship, name, gender);
 
     const cleanSender = senderName ? senderName.trim() : '';
@@ -79,6 +87,12 @@ export const getBigWishes = (
 ) => {
     const lang = normalizeLanguage(language);
 
+    if (lang === 'zh') {
+        return [
+            { emoji: "✨", wish: `${name}，愿你有时间做真正喜欢的事。` },
+            { emoji: "🌙", wish: "愿好消息常来，也愿你每天都能睡个好觉。" },
+        ];
+    }
     if (lang === 'fr') {
         return FRENCH_BIG_WISHES(name, relationship, interests);
     }

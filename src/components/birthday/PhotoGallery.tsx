@@ -19,7 +19,7 @@ export const PhotoGallery = () => {
     const cachedRectRef = useRef<DOMRect | null>(null);
     const isMobile = useIsMobile();
     const { config, getAnimationPacing } = useBirthdayStore();
-    const { t, isHindi, isBengali, isFrench } = useTranslation();
+    const { t, isHindi, isBengali, isFrench, isChinese } = useTranslation();
     const { relationship } = config;
     const animationPacing = getAnimationPacing();
     const reducedMotion = isReducedMotion || isMobile;
@@ -36,7 +36,7 @@ export const PhotoGallery = () => {
     const photos = useMemo(() => {
         if (validPhotos.length === 0) return [];
 
-        const captions = isFrench ? (relationship === 'partner' ? [
+        const captions = isChinese ? ["值得记住的一刻"] : isFrench ? (relationship === 'partner' ? [
             "Chaque moment à tes côtés est un cadeau précieux 💖",
             "Bâtir notre merveilleux avenir ensemble ✨",
             "Le lieu préféré de mon cœur 🌹"
@@ -91,7 +91,7 @@ export const PhotoGallery = () => {
             key: `photo-${i}`,
             caption: config.photoCaptions?.[i] || captions[i % captions.length] || (isFrench ? "Doux souvenir" : isBengali ? "সুন্দর স্মৃতি" : isHindi ? "खूबसूरत याद" : "Beautiful memory"),
         }));
-    }, [validPhotos, relationship, config.photoCaptions, isHindi, isBengali, isFrench]);
+    }, [validPhotos, relationship, config.photoCaptions, isHindi, isBengali, isFrench, isChinese]);
 
     const x = useMotionValue(0);
     const y = useMotionValue(0);
@@ -223,8 +223,8 @@ export const PhotoGallery = () => {
                         {t('memories.title')}
                     </h2>
                     <p className="text-base sm:text-xl text-foreground/80 font-light max-w-xl mx-auto leading-relaxed mb-6">
-                        {isFrench
-                            ? "Nous n'avons pas encore de photos ensemble ici, mais nous allons assurément créer d'innombrables souvenirs inoubliables !"
+                        {isChinese ? "相册里的照片正在整理。"
+                            : isFrench ? "Nous n'avons pas encore de photos ensemble ici, mais nous allons assurément créer d'innombrables souvenirs inoubliables !"
                             : isBengali
                             ? "আমাদের একসাথে কোনো ছবি এখনো যোগ করা হয়নি, তবে সামনে আমরা অনেক সুন্দর স্মৃতি তৈরি করব!"
                             : isHindi
@@ -233,7 +233,7 @@ export const PhotoGallery = () => {
                     </p>
                     <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/5 border border-white/10 text-xs sm:text-sm text-white/60">
                         <Sparkles size={14} className="text-primary" />
-                        <span>{isFrench ? "De nouvelles aventures à venir ✨" : isBengali ? "সামনে আসছে দারুণ সব স্মৃতি ✨" : isHindi ? "ढेर सारी नई यादें आने वाली हैं ✨" : "Future adventures await ✨"}</span>
+                        <span>{isChinese ? "留给值得记住的日子" : isFrench ? "De nouvelles aventures à venir ✨" : isBengali ? "সামনে আসছে দারুণ সব স্মৃতি ✨" : isHindi ? "ढेर सारी नई यादें आने वाली हैं ✨" : "Future adventures await ✨"}</span>
                     </div>
                 </motion.div>
             </section>
@@ -241,14 +241,14 @@ export const PhotoGallery = () => {
     }
 
     return (<>
-      <section ref={sectionRef} className="relative z-20 px-4 py-32 max-w-7xl mx-auto overflow-hidden" aria-label="Photo Memories Gallery">
+      <section ref={sectionRef} className="relative z-20 px-4 py-32 max-w-7xl mx-auto overflow-hidden" aria-label={t("memories.title")}>
         <motion.h2 initial={{ opacity: 0, scale: 0.8 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} className="font-display text-6xl md:text-8xl lg:text-[10rem] font-black text-center mb-24 bg-gradient-to-b from-white via-white/80 to-white/20 bg-clip-text text-transparent drop-shadow-2xl">
           {t('memories.title')}
         </motion.h2>
 
         <motion.div onMouseEnter={handleMouseEnter} onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave} style={{ rotateX, rotateY, perspective: 1000 }} className={`relative group ${isMobile ? '' : 'cursor-none'}`}>
           <AnimatePresence mode="wait">
-            <motion.div key={activeIndex} initial={isMobile ? { opacity: 1, scale: 1, rotateY: 0 } : { opacity: 0, scale: 0.94, rotateY: -12 }} animate={{ opacity: 1, scale: 1, rotateY: 0 }} exit={isMobile ? undefined : { opacity: 0, scale: 1.06, rotateY: 12 }} transition={{ duration: transitionDuration, ease: [0.22, 1, 0.36, 1] }} style={{ aspectRatio: photoRatios[photos[activeIndex].key] ?? 16 / 9 }} className="relative rounded-[3rem] overflow-hidden shadow-[0_60px_120px_-20px_rgba(0,0,0,0.8)] border border-white/10 max-h-[75vh] max-w-4xl mx-auto flex items-center justify-center bg-black/40" onClick={() => setLightbox(activeIndex)}>
+            <motion.div key={activeIndex} initial={isMobile ? { opacity: 1, scale: 1, rotateY: 0 } : { opacity: 0, scale: 0.94, rotateY: -12 }} animate={{ opacity: 1, scale: 1, rotateY: 0 }} exit={isMobile ? undefined : { opacity: 0, scale: 1.06, rotateY: 12 }} transition={{ duration: transitionDuration, ease: [0.22, 1, 0.36, 1] }} style={{ aspectRatio: photoRatios[photos[activeIndex].key] ?? 16 / 9 }} className="relative rounded-[3rem] overflow-hidden shadow-[0_60px_120px_-20px_rgba(0,0,0,0.8)] border border-white/10 max-h-[75vh] max-w-4xl mx-auto flex items-center justify-center bg-black/40">
               {failedImages[photos[activeIndex].key] ? (
                 <div className="w-full h-full min-h-[350px] flex flex-col items-center justify-center p-8 bg-white/5 backdrop-blur-xl text-center">
                   <div className="w-20 h-20 rounded-full bg-white/10 flex items-center justify-center text-4xl mb-4">📸</div>
@@ -289,21 +289,26 @@ export const PhotoGallery = () => {
               </div>
 
               
-              <motion.div style={{ x, y }} className="absolute inset-0 pointer-events-none flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                <div className="w-24 h-24 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white font-black uppercase tracking-widest text-xs">
+              <button
+                type="button"
+                aria-label={t('memories.viewLarge')}
+                onClick={() => setLightbox(activeIndex)}
+                className="absolute inset-0 flex items-center justify-center rounded-[3rem] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-4px] focus-visible:outline-primary"
+              >
+                <motion.span style={{ x, y }} className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white font-black uppercase tracking-widest text-xs opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity">
                   {t('memories.viewLarge')}
-                </div>
-              </motion.div>
+                </motion.span>
+              </button>
             </motion.div>
           </AnimatePresence>
 
           
           {photos.length > 1 && (
-            <div className="absolute inset-0 flex items-center justify-between px-8 opacity-0 group-hover:opacity-100 transition-all duration-500">
-              <button aria-label="Previous photo" onClick={(e) => { e.stopPropagation(); setActiveIndex((activeIndex - 1 + photos.length) % photos.length); }} className="w-20 h-20 rounded-full bg-black/40 backdrop-blur-xl border border-white/10 flex items-center justify-center text-white text-4xl hover:bg-primary transition-all shadow-2xl">
+            <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-between px-3 sm:px-8 opacity-100 md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100 transition-opacity">
+              <button aria-label={isChinese ? "上一张" : "Previous photo"} onClick={(e) => { e.stopPropagation(); setActiveIndex((activeIndex - 1 + photos.length) % photos.length); }} className="pointer-events-auto w-11 h-11 sm:w-16 sm:h-16 rounded-full bg-black/40 backdrop-blur-xl border border-white/10 flex items-center justify-center text-white text-4xl hover:bg-primary transition-all shadow-2xl">
                 ‹
               </button>
-              <button aria-label="Next photo" onClick={(e) => { e.stopPropagation(); setActiveIndex((activeIndex + 1) % photos.length); }} className="w-20 h-20 rounded-full bg-black/40 backdrop-blur-xl border border-white/10 flex items-center justify-center text-white text-4xl hover:bg-primary transition-all shadow-2xl">
+              <button aria-label={isChinese ? "下一张" : "Next photo"} onClick={(e) => { e.stopPropagation(); setActiveIndex((activeIndex + 1) % photos.length); }} className="pointer-events-auto w-11 h-11 sm:w-16 sm:h-16 rounded-full bg-black/40 backdrop-blur-xl border border-white/10 flex items-center justify-center text-white text-4xl hover:bg-primary transition-all shadow-2xl">
                 ›
               </button>
             </div>
@@ -313,7 +318,7 @@ export const PhotoGallery = () => {
         
         {photos.length > 1 && (
           <div className="flex justify-center mt-20 gap-8">
-            {photos.map((photo, i) => (<motion.div key={i} role="button" tabIndex={0} aria-label={`View photo ${i + 1}: ${photo.caption}`} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setActiveIndex(i); } }} onClick={() => setActiveIndex(i)} whileHover={!isMobile ? { scale: 1.15, y: -10, rotate: i % 2 === 0 ? 2 : -2 } : undefined} whileTap={{ scale: 0.9 }} className={`relative cursor-pointer rounded-3xl overflow-hidden w-28 h-28 md:w-40 md:h-40 border-4 transition-all duration-700 focus:outline-none focus:ring-2 focus:ring-primary ${i === activeIndex ? "border-primary scale-110 shadow-[0_20px_50px_rgba(var(--color-primary-rgb,255,107,107),0.4)]" : "border-transparent opacity-30 hover:opacity-100"}`}>
+            {photos.map((photo, i) => (<motion.div key={i} role="button" tabIndex={0} aria-label={isChinese ? ("第 " + (i + 1) + " 张 · " + photo.caption) : `View photo ${i + 1}: ${photo.caption}`} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setActiveIndex(i); } }} onClick={() => setActiveIndex(i)} whileHover={!isMobile ? { scale: 1.15, y: -10, rotate: i % 2 === 0 ? 2 : -2 } : undefined} whileTap={{ scale: 0.9 }} className={`relative cursor-pointer rounded-3xl overflow-hidden w-28 h-28 md:w-40 md:h-40 border-4 transition-all duration-700 focus:outline-none focus:ring-2 focus:ring-primary ${i === activeIndex ? "border-primary scale-110 shadow-[0_20px_50px_rgba(var(--color-primary-rgb,255,107,107),0.4)]" : "border-transparent opacity-30 hover:opacity-100"}`}>
                 <img
                   src={fallbackUrls[photo.key] || photo.src}
                   alt={photo.caption || `Celebration photo memory thumbnail ${i + 1}`}
@@ -352,7 +357,7 @@ export const PhotoGallery = () => {
                   {photos[lightbox].caption}
                 </p>
               </div>
-              <button aria-label="Close enlarged photo view" onClick={() => setLightbox(null)} className="absolute top-4 right-4 md:-top-12 md:-right-12 w-12 h-12 md:w-20 md:h-20 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-xl border border-white/10 flex items-center justify-center text-white text-xl md:text-3xl transition-all shadow-2xl z-50">
+              <button aria-label={isChinese ? "关闭大图" : "Close enlarged photo view"} onClick={() => setLightbox(null)} className="absolute top-4 right-4 md:-top-12 md:-right-12 w-12 h-12 md:w-20 md:h-20 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-xl border border-white/10 flex items-center justify-center text-white text-xl md:text-3xl transition-all shadow-2xl z-50">
                 ✕
               </button>
             </motion.div>

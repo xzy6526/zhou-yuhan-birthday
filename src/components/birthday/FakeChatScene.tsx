@@ -130,7 +130,7 @@ export const FakeChatScene = ({ onComplete }: FakeChatSceneProps) => {
 
     const { playType, playWhoosh, playReveal, playPop } = useSoundManager();
     const { config } = useBirthdayStore();
-    const { t, isHindi, isBengali, isFrench } = useTranslation();
+    const { t, isHindi, isBengali, isFrench, isChinese } = useTranslation();
     const { name, relationship, favoriteColor, gender } = config;
 
     const isMale = gender === "male";
@@ -140,6 +140,7 @@ export const FakeChatScene = ({ onComplete }: FakeChatSceneProps) => {
     const basicText = t("common.happyBirthday");
 
     const heartfeltText = useMemo(() => {
+        if (isChinese) return "今天有几句话，想专门送给你。";
         if (isFrench) {
             if (relationship === "partner")
                 return isMale ? "Pour l'homme qui fait battre mon cœur... ❤️" : isFemale ? "Pour la femme de mes rêves... ❤️" : "Pour l'âme qui me complète... ❤️";
@@ -208,7 +209,7 @@ export const FakeChatScene = ({ onComplete }: FakeChatSceneProps) => {
         if (relationship === "mentor" || relationship === "colleague")
             return "A regular birthday ping? For our greatest inspiration? We built something better! 🎯✨";
         return "A simple text could never capture how much you mean to our family... 💝🌟";
-    }, [relationship, isMale, isFemale, isHindi, isBengali, isFrench]);
+    }, [relationship, isMale, isFemale, isHindi, isBengali, isFrench, isChinese]);
 
     const triggerHeartBurst = useCallback((clientX?: number, clientY?: number) => {
         playPop();
@@ -604,10 +605,10 @@ export const FakeChatScene = ({ onComplete }: FakeChatSceneProps) => {
                                 <span className="text-[10px] text-[#00E676] font-medium tracking-normal normal-case flex items-center gap-1">
                                     {phase === "typing-basic" || phase === "typing-heartfelt" ? (
                                         <span className="text-white/60 italic flex items-center gap-0.5">
-                                            typing<span className="animate-pulse">...</span>
+                                            {isChinese ? "正在输入" : "typing"}<span className="animate-pulse">...</span>
                                         </span>
                                     ) : (
-                                        "Active now"
+                                        isChinese ? "在线" : "Active now"
                                     )}
                                 </span>
                             </div>
@@ -647,7 +648,7 @@ export const FakeChatScene = ({ onComplete }: FakeChatSceneProps) => {
                         {/* Centered Timestamp Pill */}
                         <div className="text-center my-0.5">
                             <span className="px-2.5 py-0.5 rounded-full bg-white/5 text-[10px] text-white/55 tracking-normal normal-case font-medium backdrop-blur-md border border-white/5">
-                                Today • 12:00 AM
+                                {isChinese ? "今天 · 00:00" : "Today • 12:00 AM"}
                             </span>
                         </div>
 
@@ -729,10 +730,10 @@ export const FakeChatScene = ({ onComplete }: FakeChatSceneProps) => {
                                     >
                                         {phase === "seen" || phase === "climax" || phase === "done" ? (
                                             <span className="flex items-center gap-1 text-rose-300/85">
-                                                Seen just now • <Heart size={9} fill="#FF2A6D" className="inline text-[#FF2A6D]" />
+                                                {isChinese ? "刚刚已读" : "Seen just now"} · <Heart size={9} fill="#FF2A6D" className="inline text-[#FF2A6D]" />
                                             </span>
                                         ) : (
-                                            <span>Delivered</span>
+                                            <span>{isChinese ? "已送达" : "Delivered"}</span>
                                         )}
                                     </motion.div>
                                 </motion.div>
@@ -790,7 +791,7 @@ export const FakeChatScene = ({ onComplete }: FakeChatSceneProps) => {
                                         </span>
                                     ) : (
                                         <span className="text-white/40 text-[13px] sm:text-[14px] normal-case tracking-normal">
-                                            Message...
+                                            {isChinese ? "输入消息…" : "Message..."}
                                         </span>
                                     )}
                                 </div>
@@ -830,7 +831,7 @@ export const FakeChatScene = ({ onComplete }: FakeChatSceneProps) => {
                             {/* Send Button with Realistic Depress + Darken Animation */}
                             <button
                                 type="button"
-                                aria-label="Send message"
+                                aria-label={isChinese ? "发送消息" : "Send message"}
                                 onClick={() => handleManualKeyPress("send")}
                                 className={`w-9 h-9 rounded-full flex items-center justify-center text-white shrink-0 mb-0.5 transition-all duration-150 ${
                                     isSendDepressed
@@ -1005,7 +1006,7 @@ export const FakeChatScene = ({ onComplete }: FakeChatSceneProps) => {
                                                     : "bg-[#3A3A44] text-white/85 shadow-[0_1.5px_0_#000000] border-t border-white/15"
                                             }`}
                                         >
-                                            space
+                                            {isChinese ? "空格" : "space"}
                                         </button>
 
                                         {/* Keyboard Send / Return Key */}
@@ -1021,7 +1022,7 @@ export const FakeChatScene = ({ onComplete }: FakeChatSceneProps) => {
                                                     : "bg-[#3797EF] shadow-[0_1.5px_0_#000000] border-t border-white/20"
                                             }`}
                                         >
-                                            <span>Send</span>
+                                            <span>{isChinese ? "发送" : "Send"}</span>
                                             <CornerDownLeft size={12} />
                                         </button>
                                     </div>

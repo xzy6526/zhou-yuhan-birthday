@@ -1,3 +1,47 @@
+# 周昱含生日祝福
+
+基于 [Birthday Bloom](https://github.com/naborajs/birthday-bloom) 的简体中文版。上游基线为 `660f59d`，使用 MIT 许可。
+
+## 当前进度
+
+- 本地预览已接入简体中文开场、祝福语、回忆相册、信封和分享窗口。
+- 主页面先展示用户提供的星空蛋糕，再进入回忆相册。蛋糕项目副本保留原 3D 模型、旋转和六条星轨，支持许愿、熄灭和重新点亮蜡烛。
+- 回忆相册等待真实照片和配文。发布状态为本地预览，待补入照片后可进行手机真机验收。
+- 原模板部分背景音乐和音效链接返回 403，当前预览使用静音配置。提供可用的音频后，可通过 `.env.local` 中的 `VITE_BGM_URL` 配置背景音乐。
+
+## 运行预览
+
+```powershell
+npm ci
+npm run dev -- --host 127.0.0.1 --port 4173
+```
+
+打开 [本地预览](http://127.0.0.1:4173/)。从首页进入，或使用 [直达主页面](http://127.0.0.1:4173/?phase=main) 快速查看蛋糕。
+
+## 修改内容和加入照片
+
+- 收件人、祝福和信件在 [.env](.env)。
+- 生日蛋糕在 [项目内的 HTML 副本](public/cake/birthday-cake-demo.html)，原文件保存在下载目录。
+- 把照片放到本项目 `public/memories/`，在根目录新建 `.env.local`。照片和配文按同一顺序用 `|` 分隔，修改后重启预览。配置示例如下。
+
+```dotenv
+VITE_PHOTOS="/memories/001.jpg|/memories/002.jpg"
+VITE_PHOTO_CAPTIONS="第一张的回忆|第二张的回忆"
+```
+
+`npm run verify` 执行类型检查、ESLint、构建和测试。编译产物在 `dist/`。
+
+## 验证记录
+
+- `npm run verify` 通过，24 份测试文件共 479 项。ESLint 有 2 条上游警告。
+- 用构建后的页面检查了开场自然过渡到主页面。Edge 桌面与模拟手机也检查了蛋糕渲染、拖动、松手停留、复位、烛光熄灭和重新点亮。
+- 用 18 张测试图检查了配文匹配、选中末张、打开大图与退出。测试图通过预览参数临时加载。
+- 相册真实内容与手机真机验收待补。
+
+最后更新于 2026-11-19。
+
+---
+
 # 🌸 Birthday Bloom — Configurable Birthday Landing Page v3.4.0
 
 <div align="center">

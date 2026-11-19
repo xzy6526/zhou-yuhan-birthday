@@ -4,6 +4,7 @@ import { enTranslations } from "./locales/en";
 import { hiTranslations } from "./locales/hi";
 import { bnTranslations } from "./locales/bn";
 import { fr as frTranslations } from "./locales/fr";
+import { zhTranslations } from "./locales/zh";
 import { SupportedLanguage, normalizeLanguage } from "./languageUtils";
 
 export type { SupportedLanguage };
@@ -14,6 +15,7 @@ export const translations: Record<SupportedLanguage, TranslationSchema> = {
     hi: hiTranslations,
     bn: bnTranslations,
     fr: frTranslations,
+    zh: zhTranslations,
 };
 
 export const getTranslation = (lang?: string): TranslationSchema => {
@@ -68,6 +70,7 @@ export const useTranslation = () => {
         isHindi: language === 'hi',
         isBengali: language === 'bn',
         isFrench: language === 'fr',
+        isChinese: language === 'zh',
         translations: currentTranslations,
     };
 };

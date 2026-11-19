@@ -55,6 +55,7 @@ describe("Dynamic SEO, URL Parameters & Viral Sharing Test Suite", () => {
       expect(parseBirthdayUrlParams("?lang=bangla").language).toBe("bn");
       expect(parseBirthdayUrlParams("?lang=francais").language).toBe("fr");
       expect(parseBirthdayUrlParams("?lang=english").language).toBe("en");
+      expect(parseBirthdayUrlParams("?lang=zh-CN").language).toBe("zh");
     });
 
     it("safely handles empty or malformed search queries", () => {
@@ -87,6 +88,13 @@ describe("Dynamic SEO, URL Parameters & Viral Sharing Test Suite", () => {
       const kwMeta = document.querySelector('meta[name="keywords"]');
       expect(kwMeta).not.toBeNull();
       expect(kwMeta?.getAttribute("content")).toContain("Sophia birthday");
+    });
+
+    it("sets the title, document language, and share locale for Chinese", () => {
+      render(<SEOTestComponent config={{ ...initialConfig, name: "周昱含", language: "zh" }} />);
+      expect(document.title).toBe("周昱含，生日快乐！");
+      expect(document.documentElement.lang).toBe("zh-CN");
+      expect(document.querySelector('meta[property="og:locale"]')?.getAttribute("content")).toBe("zh_CN");
     });
 
     it("updates OpenGraph and Twitter tags dynamically", () => {

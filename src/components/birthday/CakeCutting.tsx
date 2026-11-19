@@ -80,7 +80,7 @@ export const CakeCutting = () => {
     const { fireCinematicCelebration } = useConfetti();
     const { playBoom, playReveal, playPop, playWhoosh } = useSoundManager();
     const { name, age, relationship, gender, favoriteColor } = useBirthdayStore(state => state.config);
-    const { t, isHindi, isBengali, isFrench } = useTranslation();
+    const { t, isHindi, isBengali, isFrench, isChinese, language } = useTranslation();
     const primaryColor = favoriteColor || '#FF6B6B';
 
     const quotes = useMemo(() => {
@@ -96,6 +96,13 @@ export const CakeCutting = () => {
                     : (SPECIAL_QUOTES[relKey] || SPECIAL_QUOTES.friend);
         const signatureTemplateQuote = templateQuotePool?.[0];
 
+        if (isChinese) {
+            return [
+                { text: (name || "今天的寿星") + "，生日快乐！", animation: "zoom-in" as const },
+                { text: t('cake.maySmilesBrighten'), animation: "stagger-up" as const },
+                { text: t('cake.cherishEveryDay'), animation: "float" as const },
+            ];
+        }
         if (isFrench) {
             if (relationship === 'partner') return [
                 { text: `Mon ${isMale ? 'Prince' : isFemale ? 'Princesse' : 'Amour'}...`, animation: "zoom-in" as const },
@@ -197,7 +204,7 @@ export const CakeCutting = () => {
             { text: "Happy Birthday!", animation: "typewriter-burst" as const },
             { text: `Stay blessed always ✨`, animation: "float" as const },
         ];
-    }, [name, relationship, gender, isHindi, isBengali, isFrench, t]);
+    }, [name, relationship, gender, isHindi, isBengali, isFrench, isChinese, t]);
 
     const handleSelectCake = useCallback((cake: CakeOption) => {
         if (typeof navigator !== 'undefined' && navigator.vibrate) navigator.vibrate(30);
@@ -328,7 +335,7 @@ export const CakeCutting = () => {
                         <motion.div 
                             role="dialog"
                             aria-modal="true"
-                            aria-label="3D Cake Cutting Experience"
+                            aria-label={isChinese ? "生日蛋糕" : "3D Cake Cutting Experience"}
                             initial={{ opacity: 0 }} 
                             animate={{ opacity: 1 }} 
                             exit={{ opacity: 0 }} 
@@ -339,7 +346,7 @@ export const CakeCutting = () => {
                         >
                             <button
                                 type="button"
-                                aria-label={isFrench ? "Fermer l'expérience du gâteau" : isBengali ? "কেকের অভিজ্ঞতা বন্ধ করুন" : isHindi ? "केक का अनुभव बंद करें" : "Close cake experience"}
+                                aria-label={isChinese ? "关闭蛋糕" : isFrench ? "Fermer l'expérience du gâteau" : isBengali ? "কেকের অভিজ্ঞতা বন্ধ করুন" : isHindi ? "केक का अनुभव बंद करें" : "Close cake experience"}
                                 onClick={() => setPhase("select")}
                                 className="fixed top-6 right-6 z-[110] w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white flex items-center justify-center text-xl transition-all shadow-xl backdrop-blur-md focus:outline-none focus:ring-2 focus:ring-primary"
                             >
@@ -369,7 +376,7 @@ export const CakeCutting = () => {
                                             </div>
                                             <div className="flex flex-col items-center gap-2">
                                                 <h2 className="text-3xl md:text-4xl font-display font-black tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-primary to-white uppercase">
-                                                    {isFrench ? "Préparation de votre gâteau..." : isBengali ? "আপনার কেক তৈরি হচ্ছে..." : isHindi ? "आपका केक तैयार हो रहा है..." : "Baking Your Cake..."}
+                                                    {isChinese ? "正在点亮蜡烛…" : isFrench ? "Préparation de votre gâteau..." : isBengali ? "আপনার কেক তৈরি হচ্ছে..." : isHindi ? "आपका केक तैयार हो रहा है..." : "Baking Your Cake..."}
                                                 </h2>
                                                 <div className="flex gap-1 mt-2">
                                                     {[1, 2, 3].map((i) => (
@@ -396,7 +403,7 @@ export const CakeCutting = () => {
                                     }}
                                 >
                                     <span>{cake.emoji}</span>
-                                    <span>{getCakeName(cake, isHindi, isBengali, isFrench)}</span>
+                                    <span>{getCakeName(cake, language)}</span>
                                     {name && (
                                         <>
                                             <span className="text-white/30">•</span>
@@ -521,13 +528,13 @@ export const CakeCutting = () => {
                                                 }}
                                             >
                                                 <span className="relative z-10 flex items-center gap-2">
-                                                    <span>{isFrench ? "Couper le Gâteau ✨" : isBengali ? "কেক কাটুন ✨" : isHindi ? "केक काटिए ✨" : "Cut The Cake ✨"}</span>
+                                                    <span>{isChinese ? "切蛋糕" : isFrench ? "Couper le Gâteau ✨" : isBengali ? "কেক কাটুন ✨" : isHindi ? "केक काटिए ✨" : "Cut The Cake ✨"}</span>
                                                     <span>🎂</span>
                                                 </span>
                                                 <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-400" />
                                             </motion.button>
                                             <p className="text-white/60 text-xs sm:text-sm tracking-widest uppercase font-medium animate-pulse">
-                                                {isFrench ? "Touchez pour trancher le gâteau" : isBengali ? "কেকটি কাটতে স্পর্শ করুন" : isHindi ? "केक काटने के लिए टैप करें" : "Tap to slice the cake"}
+                                                {isChinese ? "点一下切蛋糕" : isFrench ? "Touchez pour trancher le gâteau" : isBengali ? "কেকটি কাটতে স্পর্শ করুন" : isHindi ? "केक काटने के लिए टैप करें" : "Tap to slice the cake"}
                                             </p>
                                         </motion.div>
                                     )}
@@ -560,7 +567,7 @@ export const CakeCutting = () => {
                                         onClick={() => setPhase("select")} 
                                         className="mt-16 px-10 py-4 rounded-full text-sm font-black uppercase tracking-[0.3em] text-white/40 hover:text-white border border-white/10 hover:bg-white/5 transition-all duration-500"
                                     >
-                                        {isFrench ? "✕ Terminer l'expérience" : isBengali ? "✕ অভিজ্ঞতা সমাপ্ত করুন" : isHindi ? "✕ अनुभव समाप्त करें" : "✕ Finish Experience"}
+                                        {isChinese ? "回到生日页" : isFrench ? "✕ Terminer l'expérience" : isBengali ? "✕ অভিজ্ঞতা সমাপ্ত করুন" : isHindi ? "✕ अनुभव समाप्त करें" : "✕ Finish Experience"}
                                     </motion.button>
                                 )}
                             </div>

@@ -48,7 +48,7 @@ export const EnvelopeLetterScene = ({
 
     const { config } = useBirthdayStore();
     const { playPop, playWhoosh, playType } = useSoundManager();
-    const { isHindi, isBengali, isFrench, language } = useTranslation();
+    const { isHindi, isBengali, isFrench, isChinese, language } = useTranslation();
     const isMobile = useIsMobile();
     const typingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -257,8 +257,8 @@ export const EnvelopeLetterScene = ({
                                 💜
                             </span>
                             <h3 className="font-display italic text-2xl sm:text-3xl text-white font-bold tracking-wide mt-2 drop-shadow-lg">
-                                {isFrench
-                                    ? "Pendant ce temps, la surprise 😭💌"
+                                {isChinese ? "有一封信，等你打开"
+                                    : isFrench ? "Pendant ce temps, la surprise 😭💌"
                                     : isBengali
                                         ? "এদিকে তোমার জন্য বিশেষ চিঠি 😭💌"
                                         : isHindi
@@ -305,7 +305,7 @@ export const EnvelopeLetterScene = ({
                                 className="absolute bottom-3 w-[88%] h-[60%] bg-[#FAF5EA] rounded-xl shadow-inner border border-[#E8DFC8] flex items-center justify-center z-10"
                             >
                                 <p className="font-script text-xs sm:text-sm text-[#8B5A2B] opacity-70">
-                                    {isFrench ? "Pour toi..." : isBengali ? "তোমার জন্য..." : isHindi ? "आपके लिए..." : "For you..."}
+                                    {isChinese ? "给你" : isFrench ? "Pour toi..." : isBengali ? "তোমার জন্য..." : isHindi ? "आपके लिए..." : "For you..."}
                                 </p>
                             </motion.div>
                         </div>
@@ -313,8 +313,8 @@ export const EnvelopeLetterScene = ({
                         <p className="font-display text-xs sm:text-sm tracking-widest uppercase text-white/50 mt-4 flex items-center gap-2">
                             <Sparkles size={14} className="text-primary animate-pulse" />
                             {isOpen
-                                ? (isFrench ? "Ouverture de la lettre..." : isBengali ? "চিঠি খোলা হচ্ছে..." : isHindi ? "पत्र खुल रहा है..." : "Opening letter...")
-                                : (isFrench ? "Appuyez pour ouvrir 💌" : isBengali ? "চিঠি খুলতে স্পর্শ করুন 💌" : isHindi ? "खोलने के लिए टैप करें 💌" : "Tap to open letter 💌")}
+                                ? (isChinese ? "正在打开信封…" : isFrench ? "Ouverture de la lettre..." : isBengali ? "চিঠি খোলা হচ্ছে..." : isHindi ? "पत्र खुल रहा है..." : "Opening letter...")
+                                : (isChinese ? "打开这封信" : isFrench ? "Appuyez pour ouvrir 💌" : isBengali ? "চিঠি খুলতে স্পর্শ করুন 💌" : isHindi ? "खोलने के लिए टैप करें 💌" : "Tap to open letter 💌")}
                         </p>
                     </motion.div>
                 ) : (
@@ -411,7 +411,7 @@ export const EnvelopeLetterScene = ({
                         {/* Luxury Stationery Footer / Sign-off & Stickers */}
                         <div className="relative z-10 mt-8 pt-4 border-t border-[#D4AF37]/35 flex items-center justify-between">
                             <div className="font-script text-lg sm:text-xl md:text-2xl text-[#5C3215] font-bold tracking-wide">
-                                {senderName ? `— ${senderName}` : `— Yours Forever 💕`}
+                                {senderName ? `— ${senderName}` : isChinese ? "—— 生日快乐" : `— Yours Forever 💕`}
                             </div>
                             <div className="flex items-center gap-1.5 text-3xl sm:text-4xl filter drop-shadow-[0_4px_8px_rgba(0,0,0,0.15)] select-none animate-subtle-float">
                                 {emojiKit.accent?.length > 0
@@ -433,7 +433,7 @@ export const EnvelopeLetterScene = ({
                                     onClick={onComplete}
                                     className="inline-flex items-center gap-2 px-8 py-3 rounded-full bg-gradient-to-r from-[#A60F35] via-[#D11A48] to-[#FF2A6D] text-white font-semibold text-sm sm:text-base tracking-wide shadow-[0_10px_25px_rgba(166,15,53,0.4)] hover:shadow-[0_15px_35px_rgba(166,15,53,0.6)] transition-all duration-300 hover:scale-105 active:scale-95 border border-[#FFD166]/40"
                                 >
-                                    <span>{isFrench ? "Continuer la Fête ✨" : isBengali ? "উদযাপনে এগিয়ে যান ✨" : isHindi ? "जश्न जारी रखें ✨" : "Continue Celebration ✨"}</span>
+                                    <span>{isChinese ? "继续看生日惊喜" : isFrench ? "Continuer la Fête ✨" : isBengali ? "উদযাপনে এগিয়ে যান ✨" : isHindi ? "जश्न जारी रखें ✨" : "Continue Celebration ✨"}</span>
                                     <ArrowRight size={17} />
                                 </button>
                             </motion.div>

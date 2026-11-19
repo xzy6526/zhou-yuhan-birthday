@@ -27,6 +27,7 @@ export interface CakeOption {
     nameHi?: string;
     nameBn?: string;
     nameFr?: string;
+    nameZh?: string;
     emoji: string;
     image: string;
     layers: string[];
@@ -42,6 +43,7 @@ export const getCakeName = (
 ): string => {
     if (typeof langOrIsHindi === "string") {
         const lang = normalizeLanguage(langOrIsHindi);
+        if (lang === "zh" && cake.nameZh) return cake.nameZh;
         if (lang === "fr" && cake.nameFr) return cake.nameFr;
         if (lang === "bn" && cake.nameBn) return cake.nameBn;
         if (lang === "hi" && cake.nameHi) return cake.nameHi;
@@ -57,6 +59,7 @@ export const CAKE_OPTIONS: CakeOption[] = [
     {
         id: "chocolate",
         name: "Chocolate Dream",
+        nameZh: "巧克力蛋糕",
         nameHi: "चॉकलेट ड्रीम",
         nameBn: "চকলেট ড্রিম",
         nameFr: "Rêve Chocolaté",
@@ -80,6 +83,7 @@ export const CAKE_OPTIONS: CakeOption[] = [
     {
         id: "strawberry",
         name: "Strawberry Bliss",
+        nameZh: "草莓蛋糕",
         nameHi: "स्ट्रॉबेरी ब्लिस",
         nameBn: "স্ট্রবেরি ব্লিস",
         nameFr: "Délice Fraise",
@@ -103,6 +107,7 @@ export const CAKE_OPTIONS: CakeOption[] = [
     {
         id: "royal",
         name: "Royal Velvet",
+        nameZh: "紫绒蛋糕",
         nameHi: "रॉयल वेलवेट",
         nameBn: "রয়্যাল ভেলভেট",
         nameFr: "Velours Royal",
@@ -126,6 +131,7 @@ export const CAKE_OPTIONS: CakeOption[] = [
     {
         id: "nature",
         name: "Floral Garden",
+        nameZh: "花园蛋糕",
         nameHi: "फ्लोरल गार्डन",
         nameBn: "ফ্লোরাল গার্ডেন",
         nameFr: "Jardin Floral",

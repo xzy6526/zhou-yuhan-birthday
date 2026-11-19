@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { useSoundManager } from "./SoundManager";
 import { HeartProgression } from "./HeartProgression";
 import { useTranslation } from "@/i18n";
+import { useBirthdayStore } from "@/features/core/store/useBirthdayStore";
 import { Sparkles } from "lucide-react";
 
 interface SplashScreenProps {
@@ -12,7 +13,8 @@ interface SplashScreenProps {
 export const SplashScreen = ({ onStart }: SplashScreenProps) => {
     const [tapped, setTapped] = useState(false);
     const { startMusic, playPop } = useSoundManager();
-    const { t } = useTranslation();
+    const { t, isChinese } = useTranslation();
+    const name = useBirthdayStore(state => state.config.name);
 
     const handleTap = () => {
         if (tapped) return;
@@ -42,7 +44,7 @@ export const SplashScreen = ({ onStart }: SplashScreenProps) => {
             onClick={handleTap}
         >
             {/* Semantic Top-Level Heading for Screen Readers & SEO */}
-            <h1 className="sr-only">Birthday Bloom — Magical Cinematic Birthday Celebration</h1>
+            <h1 className="sr-only">{isChinese ? t("common.happyBirthday") : "Birthday Bloom — Magical Cinematic Birthday Celebration"}</h1>
 
             {/* Dreamy Ambient Bokeh Auras (Zero-filter GPU-optimized multi-stop radial gradients) */}
             <div className="absolute top-[10%] left-[10%] w-[34rem] h-[34rem] rounded-full bg-[radial-gradient(circle,rgba(255,75,130,0.22)_0%,rgba(255,75,130,0.09)_40%,transparent_70%)] pointer-events-none animate-subtle-float" />
@@ -76,7 +78,7 @@ export const SplashScreen = ({ onStart }: SplashScreenProps) => {
                         {t('splash.specialSurpriseAwaits')}
                     </span>
                     <span className="font-script text-3xl sm:text-5xl font-bold italic text-gradient-romantic text-glow-rose inline-block animate-subtle-float">
-                        ✨ Made with Love ✨
+                        {isChinese ? name : "✨ Made with Love ✨"}
                     </span>
                 </h2>
 

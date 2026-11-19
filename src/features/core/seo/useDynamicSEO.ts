@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import type { BirthdayConfig } from '../store/useBirthdayStore';
-import { useTranslation } from '@/i18n';
+import { getTranslationValue, normalizeLanguage } from '@/i18n';
 
 const setMetaTag = (selector: string, attribute: 'name' | 'property', key: string, content: string) => {
   if (typeof document === 'undefined') return;
@@ -41,7 +41,6 @@ const setDynamicJsonLd = (id: string, data: object) => {
  * Twitter cards, canonical link, and JSON-LD structured data with active celebration state.
  */
 export const useDynamicSEO = (config: BirthdayConfig) => {
-  const { t, language, isBengali, isHindi, isFrench } = useTranslation();
 
   useEffect(() => {
     if (typeof document === 'undefined') return;
@@ -50,16 +49,17 @@ export const useDynamicSEO = (config: BirthdayConfig) => {
     const relationship = config.relationship || 'celebration';
     const sender = config.senderName?.trim();
 
-    const activeLanguage = (config.language || language || 'en').toLowerCase().trim();
-    const isFr = activeLanguage === 'fr' || activeLanguage === 'french' || isFrench;
-    const isBn = activeLanguage === 'bn' || activeLanguage === 'bengali' || isBengali;
-    const isHi = activeLanguage === 'hi' || activeLanguage === 'hindi' || isHindi;
+    const activeLanguage = normalizeLanguage(config.language);
+    const isZh = activeLanguage === 'zh';
+    const isFr = activeLanguage === 'fr';
+    const isBn = activeLanguage === 'bn';
+    const isHi = activeLanguage === 'hi';
 
     // 1. Dynamic Title
     let title: string;
     if (rawName) {
-      const greeting = t('common.happyBirthday');
-      title = `${greeting} ${rawName}! | Birthday Bloom`;
+      const greeting = getTranslationValue(activeLanguage, 'common.happyBirthday');
+      title = isZh ? rawName + "，生日快乐！" : `${greeting} ${rawName}! | Birthday Bloom`;
     } else {
       title = isFr
         ? "Birthday Bloom | Site Magique de Célébration d'Anniversaire Cinématographique"
@@ -93,6 +93,8 @@ export const useDynamicSEO = (config: BirthdayConfig) => {
             : "Experience a breathtaking, cinematic birthday celebration website with physics animations, emotional storytelling, custom photo galleries, and festive interactions crafted with love.";
     }
 
+    if (isZh) description = "给" + (rawName || "今天的寿星") + "的星空蛋糕、回忆和生日祝福。";
+
     setMetaTag('meta[name="description"]', 'name', 'description', description);
 
     // 3. Dynamic Keywords
@@ -111,11 +113,11 @@ export const useDynamicSEO = (config: BirthdayConfig) => {
     setMetaTag('meta[name="keywords"]', 'name', 'keywords', baseKeywords.join(', '));
 
     // 4. OpenGraph Tags
-    const ogTitle = rawName 
+    const ogTitle = isZh ? title : rawName
       ? `A Magical Birthday Surprise Just For ${rawName} ✨ — Birthday Bloom` 
       : 'A Magical Birthday Surprise Just For You ✨ — Birthday Bloom';
     
-    const locale = isFr ? 'fr_FR' : isBn ? 'bn_BD' : isHi ? 'hi_IN' : 'en_US';
+    const locale = isZh ? 'zh_CN' : isFr ? 'fr_FR' : isBn ? 'bn_BD' : isHi ? 'hi_IN' : 'en_US';
     
     setMetaTag('meta[property="og:title"]', 'property', 'og:title', ogTitle);
     setMetaTag('meta[property="og:description"]', 'property', 'og:description', description);
@@ -161,7 +163,7 @@ export const useDynamicSEO = (config: BirthdayConfig) => {
     setDynamicJsonLd('birthday-bloom-dynamic-ldjson', dynamicSchema);
 
     // Update html lang attribute
-    document.documentElement.lang = activeLanguage || 'en';
+    document.documentElement.lang = isZh ? 'zh-CN' : activeLanguage || 'en';
 
-  }, [config.name, config.age, config.relationship, config.senderName, config.language, language, t, isBengali, isHindi, isFrench]);
+  }, [config.name, config.age, config.relationship, config.senderName, config.language]);
 };
