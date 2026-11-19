@@ -7,7 +7,7 @@ interface MemoryPhoto {
 
 export interface MemoryAlbumData {
     featured: string[];
-    groups: { title: string; photos: MemoryPhoto[] }[];
+    groups: { title: string; layout?: "polaroid" | "film" | "editorial"; photos: MemoryPhoto[] }[];
 }
 
 const albums = import.meta.glob<MemoryAlbumData>("./*-album.local.json", {

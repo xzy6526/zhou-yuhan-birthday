@@ -74,7 +74,7 @@ const BirthdayMemoryAlbum = ({ album }: { album: MemoryAlbumData }) => {
 
             <div id="memory-photos" className="memory-album__groups">
                 {album.groups.map(group => (
-                    <div className="memory-album__group" key={group.title}>
+                    <div className="memory-album__group" data-layout={group.layout} key={group.title}>
                         <h3>{group.title}</h3>
                         <div className="memory-album__grid">
                             {group.photos.map((photo, i) => (
