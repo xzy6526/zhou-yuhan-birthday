@@ -1,0 +1,258 @@
+.memory-album {
+    --memory-ink: #f6edff;
+    --memory-muted: #d8c3e4;
+    color: var(--memory-ink);
+}
+
+.memory-album__intro {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem 2rem;
+    align-items: baseline;
+    justify-content: space-between;
+    margin: 0 0 1.15rem;
+}
+
+.memory-album__intro h2 {
+    font: 500 clamp(2rem, 4vw, 3.4rem)/1.12 "Songti SC", "Noto Serif SC", "SimSun", serif;
+    letter-spacing: .065em;
+}
+
+.memory-album__intro a {
+    color: var(--memory-muted);
+    font-size: .9rem;
+    padding: .35rem 0;
+    text-underline-offset: .35em;
+}
+
+.memory-album__intro a:hover {
+    color: white;
+    text-decoration: underline;
+}
+
+.memory-wall {
+    background: radial-gradient(ellipse at 47% 55%, #39214c 0%, #160f25 75%);
+    position: relative;
+    height: clamp(252px, 44vw, 445px);
+    isolation: isolate;
+    overflow: hidden;
+    border: 1px solid #e5c5ff33;
+    border-radius: clamp(1.2rem, 3vw, 2rem);
+    box-shadow: 0 20px 80px #08041075;
+}
+
+.memory-wall__surface {
+    position: absolute;
+    inset: -24% -9% auto;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: clamp(.43rem, 1.1vw, 1rem);
+    transform: perspective(1400px) rotateX(13deg) rotateY(-8deg) rotateZ(-7deg);
+    mask-image: linear-gradient(90deg, transparent, black 13%, black 87%, transparent);
+}
+
+.memory-wall::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(#160f2590, transparent 20%, transparent 75%, #160f25c0);
+}
+
+.memory-wall__lane {
+    --duration: 38s;
+    --delay: -5s;
+    --direction: normal;
+    min-width: 0;
+}
+
+.memory-wall__lane:nth-child(even) {
+    --duration: 46s;
+    --direction: reverse;
+}
+
+.memory-wall__lane:nth-child(2) { --delay: -22s; }
+.memory-wall__lane:nth-child(3) { --delay: -11s; }
+.memory-wall__lane:nth-child(4) { --delay: -28s; }
+
+.memory-wall__track {
+    animation: memory-drift var(--duration) linear var(--delay) infinite var(--direction) paused;
+}
+
+.memory-wall[data-moving="true"] .memory-wall__track {
+    animation-play-state: running;
+}
+
+.memory-wall__tiles {
+    display: grid;
+    gap: clamp(.43rem, 1.1vw, 1rem);
+    padding-bottom: clamp(.43rem, 1.1vw, 1rem);
+}
+
+.memory-wall__tiles img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: clamp(.5rem, 1vw, .9rem);
+    border: 1px solid #fff2;
+    transition: transform 240ms ease, box-shadow 240ms ease;
+}
+
+@media (hover: hover) {
+    .memory-wall__tiles img:hover {
+        position: relative;
+        z-index: 1;
+        transform: translateY(-.4rem) scale(1.025);
+        box-shadow: 0 .8rem 2rem #11081d9c;
+    }
+}
+
+.memory-wall__pause {
+    position: absolute;
+    z-index: 1;
+    bottom: .85rem;
+    right: .85rem;
+    width: 2.75rem;
+    height: 2.75rem;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    border: 1px solid #ecdbff65;
+    color: white;
+    background: #1b1126e3;
+}
+
+@keyframes memory-drift {
+    to { transform: translateY(-50%); }
+}
+
+@media (max-width: 560px) {
+    .memory-wall__surface { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .memory-wall__lane:nth-child(4) { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .memory-wall[data-moving] .memory-wall__track { animation-play-state: paused; }
+    .memory-wall__pause { display: none; }
+    .memory-wall__tiles img { transition: none; }
+    .memory-wall__tiles img:hover { transform: none; }
+}
+
+.memory-album__groups {
+    padding-top: clamp(1.75rem, 4vw, 3.5rem);
+    scroll-margin-top: 1.25rem;
+}
+
+.memory-album__group + .memory-album__group { margin-top: clamp(2rem, 5vw, 4rem); }
+
+.memory-album__group h3 {
+    font: 500 clamp(1.3rem, 2.5vw, 1.8rem)/1.25 "Songti SC", "Noto Serif SC", "SimSun", serif;
+    letter-spacing: .065em;
+    margin-bottom: 1rem;
+}
+
+.memory-album__grid {
+    --photo-gap: clamp(.5rem, 1.35vw, 1rem);
+    columns: 2;
+    column-gap: var(--photo-gap);
+}
+
+@media (min-width: 700px) { .memory-album__grid { columns: 3; } }
+@media (min-width: 1060px) { .memory-album__grid { columns: 4; } }
+
+.memory-album__grid figure {
+    break-inside: avoid;
+    margin: 0 0 var(--photo-gap);
+}
+
+.memory-album__grid button {
+    display: block;
+    overflow: hidden;
+    width: 100%;
+    border-radius: .8rem;
+    border: 1px solid #e5c5ff2b;
+    background: #1c1228;
+    cursor: zoom-in;
+}
+
+.memory-album__grid img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.memory-album__grid figcaption {
+    color: var(--memory-muted);
+    padding: .5rem .2rem .2rem;
+    line-height: 1.55;
+    overflow-wrap: anywhere;
+}
+
+.memory-album :is(a, button):focus-visible {
+    outline: 2px solid #d6a7ff;
+    outline-offset: 3px;
+}
+
+.memory-viewer {
+    margin: auto;
+    padding: 0;
+    width: min(92vw, 68rem);
+    max-height: 94dvh;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    border-radius: 1.25rem;
+    border: 1px solid #efdbff40;
+    color: #f7edf9;
+    background: #1b1126;
+}
+
+.memory-viewer::backdrop { background: #0b0712ed; }
+
+.memory-viewer__content {
+    position: relative;
+    display: grid;
+    justify-items: center;
+    gap: .75rem;
+    padding: clamp(.55rem, 1.5vw, 1rem);
+}
+
+.memory-viewer__content button {
+    width: 2.75rem;
+    height: 2.75rem;
+    display: grid;
+    place-items: center;
+    color: white;
+    border: 1px solid #ffffff50;
+    border-radius: 50%;
+    background: #25182df0;
+}
+
+.memory-viewer__close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+}
+
+.memory-viewer__photo {
+    display: block;
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: min(74dvh, 56rem);
+    border-radius: .8rem;
+}
+
+.memory-viewer__caption {
+    text-align: center;
+    max-width: 42rem;
+    line-height: 1.6;
+}
+
+.memory-viewer__nav {
+    display: flex;
+    gap: 1.35rem;
+    align-items: center;
+    justify-content: center;
+    font-variant-numeric: tabular-nums;
+}

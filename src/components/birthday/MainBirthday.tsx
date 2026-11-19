@@ -1,10 +1,11 @@
-import { useState, useEffect, useRef, useMemo } from "react";
+import { lazy, Suspense, useState, useEffect, useRef, useMemo } from "react";
 import { motion, AnimatePresence, useMotionValue, useSpring, useReducedMotion } from "framer-motion";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useConfetti } from "./Confetti";
 import { Balloons } from "./Balloons";
 import { Sparkles } from "./Sparkles";
 import { PhotoGallery } from "./PhotoGallery";
+import { localMemoryAlbum } from "@/config/localMemoryAlbum";
 import { HeartProgression } from "./HeartProgression";
 import { TypeWriter } from "./TypeWriter";
 import { useSoundManager } from "./SoundManager";
@@ -22,6 +23,8 @@ import { EnvelopeLetterScene } from "./EnvelopeLetterScene";
 import { WishDeck } from "./WishDeck";
 import { SoundToggle } from "./SoundToggle";
 import { getTemplateEmojiKit, normalizeToEmoji } from "@/config/emojiKits";
+
+const BirthdayMemoryAlbum = lazy(() => import("./BirthdayMemoryAlbum"));
 
 export const MainBirthday = () => {
     const [visible, setVisible] = useState(false);
@@ -238,7 +241,11 @@ export const MainBirthday = () => {
         </motion.div>
       </section>)}
 
-      {config.showPhotoSection && <PhotoGallery />}
+      {config.showPhotoSection && (
+        name === "周昱含" && localMemoryAlbum && !config.photos?.length
+          ? <Suspense><BirthdayMemoryAlbum album={localMemoryAlbum} /></Suspense>
+          : <PhotoGallery />
+      )}
 
       {/* Interactive Pop The Balloons Mini-Game */}
       <BalloonPopGame />

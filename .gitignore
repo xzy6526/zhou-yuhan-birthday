@@ -26,3 +26,7 @@ dist-ssr
 .env
 *.tsbuildinfo
 .agents
+
+# Birthday photo files and private album configuration
+/public/memories/
+/src/config/memory-album.local.json
