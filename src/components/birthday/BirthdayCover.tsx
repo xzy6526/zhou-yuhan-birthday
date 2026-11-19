@@ -75,6 +75,15 @@ export default function BirthdayCover({ config, cakeClicks, onCakeClick }: Cover
 
     return (
         <header className="birthday-cover" aria-labelledby="cover-title">
+            <div className="cover-fireflies" aria-hidden="true">
+                {[0, 1].map(layer => (
+                    <div key={layer}>
+                        {stardust.filter((_, i) => i % 2 === layer).map(({ x, y, radius }) => (
+                            <i key={x} style={{ left: `${x / 4.8}%`, top: `${y / 3.95}%`, width: radius * 2, height: radius * 2 }} />
+                        ))}
+                    </div>
+                ))}
+            </div>
             <div className="cover-card">
                 <div className="cover-letterhead" aria-hidden="true">
                     <Flower2 size={19} /> 生日贺卡 <i /> ✧

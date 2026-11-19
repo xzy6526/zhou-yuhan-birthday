@@ -8,10 +8,7 @@
     overflow: hidden;
     padding: clamp(16px, 3vw, 46px);
     color: var(--cream);
-    background:
-        radial-gradient(ellipse at 77% 33%, #bc709968, transparent 44%),
-        radial-gradient(ellipse at 9% 96%, #73569a85, transparent 55%),
-        linear-gradient(115deg, #211b34 3%, #38233e 58%, #302033);
+    background: #19172e;
     font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
 }
 
@@ -19,14 +16,22 @@
     content: "";
     position: absolute;
     z-index: -1;
-    inset: 0;
-    opacity: .62;
-    background-image: radial-gradient(circle, #ffe8cd 0 .8px, transparent 1.4px),
-        radial-gradient(circle, #e6bbd1 0 .65px, transparent 1.3px);
-    background-size: 113px 127px, 173px 157px;
-    background-position: 16px 25px, 68px 97px;
-    mask-image: linear-gradient(120deg, #000, transparent 36%, #000 78%);
+    inset: -3%;
+    background: radial-gradient(ellipse at 23% 48%, #16162994, transparent 43%),
+        url("../../assets/birthday/cover-nebula.webp") center / cover;
 }
+.cover-fireflies, .cover-fireflies > div { position: absolute; inset: 0; pointer-events: none; }
+.cover-fireflies { mask-image: radial-gradient(ellipse at 26% 48%, #0003, #000 54%); }
+.cover-fireflies i {
+    position: absolute; border-radius: 50%; color: #ffd3df; background: currentColor;
+    box-shadow: 0 0 5px 1px currentColor;
+}
+.cover-fireflies i:nth-child(3n) { color: #b0d3ff; }
+.cover-fireflies i:nth-child(5n) { color: #ffe2ac; }
+.cover-fireflies i:nth-child(9n)::before, .cover-fireflies i:nth-child(9n)::after {
+    content: ""; position: absolute; inset: -4px 33%; border-radius: 50%; background: currentColor;
+}
+.cover-fireflies i:nth-child(9n)::after { transform: rotate(90deg); }
 
 .cover-card {
     position: relative;
@@ -105,6 +110,14 @@
 .cover-stamp:hover { transform: rotate(4deg); }
 .cover-stamp:active { scale: .96; }
 @media (prefers-reduced-motion: no-preference) {
+    .birthday-cover::before { animation: cover-nebula-drift 30s ease-in-out infinite alternate; }
+    .cover-fireflies > div { animation: cover-particles 8s ease-in-out -3s infinite alternate; }
+    .cover-fireflies > div + div { animation-duration: 13s; animation-direction: alternate-reverse; }
+    @keyframes cover-nebula-drift { to { transform: translate(1%, -1%) scale(1.035); } }
+    @keyframes cover-particles {
+        from { opacity: .42; transform: translate(-7px, 10px); }
+        to { opacity: .95; transform: translate(11px, -16px); }
+    }
     .cover-dust { animation: cover-drift 7s ease-in-out infinite alternate; }
     .cover-dial { animation: cover-revolve 85s linear infinite; }
     .cover-moon { animation: cover-sway 10s ease-in-out infinite alternate; }
