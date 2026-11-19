@@ -89,29 +89,10 @@
 .cover-links a:focus-visible, .cover-stamp:focus-visible { outline: 3px solid #fff0d0; outline-offset: 5px; }
 
 .cover-keepsakes { position: relative; width: 100%; max-width: 560px; aspect-ratio: 1.19; justify-self: center; }
-.cover-orbits, .cover-orbits i { position: absolute; pointer-events: none; }
-.cover-orbits { inset: 2% -3%; }
-.cover-orbits i { inset: 3% 2%; border: 1px solid #ddc5a950; border-radius: 50%; transform: rotate(-24deg); }
-.cover-orbits i:nth-child(2) { inset: 13% -5%; transform: rotate(-32deg); border-style: dashed; opacity: .55; }
-.cover-orbits i:nth-child(3) { inset: 13% 4%; transform: rotate(25deg); opacity: .55; }
-.cover-glint { position: absolute; top: 16%; left: 10%; color: #f2c79d; font: 32px/1 Georgia, serif; text-shadow: 12px 16px 0 #dbaec180; }
-.cover-print {
-    position: absolute;
-    margin: 0; padding: 2% 2% 1%;
-    background: linear-gradient(120deg, #fdf5e6, #efdfcc);
-    box-shadow: 1px 3px 2px #160d1b33, 5px 15px 27px #160d1b66;
-    color: #533e43;
-}
-.cover-print img { display: block; width: 100%; height: auto; }
-.cover-print figcaption { padding: .42em 0 .28em; text-align: center; font: clamp(12px, 1.2vw, 18px)/1.45 "Kaiti SC", "STKaiti", "KaiTi", serif; }
-.cover-print--portrait { width: 52%; right: 8%; top: 0; transform: rotate(8deg); }
-.cover-print--portrait figcaption { padding-inline-start: 22%; }
-.cover-print--landscape { width: 53%; left: 0; bottom: 0; transform: rotate(-9deg); }
-.cover-print--landscape::before {
-    content: ""; position: absolute; width: 31%; height: 9%; left: 27%; top: -4%; transform: rotate(4deg);
-    background: repeating-linear-gradient(120deg, #e9beabdf 0 3px, #f3ccbbce 3px 6px);
-    clip-path: polygon(2% 0,100% 0,98% 28%,100% 48%,97% 75%,99% 100%,0 100%,2% 72%,0 45%);
-}
+.cover-sky { display: block; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.cover-moon { filter: drop-shadow(0 0 10px #f8b4ae70); transform-origin: 238px 185px; }
+.cover-dial { transform-origin: 238px 185px; }
+.cover-meteor { opacity: 0; }
 .cover-stamp {
     position: absolute; right: 0; top: -2%; z-index: 1; width: clamp(60px, 6vw, 86px); aspect-ratio: 1;
     display: grid; place-content: center; justify-items: center; gap: 3px;
@@ -124,9 +105,19 @@
 .cover-stamp:hover { transform: rotate(4deg); }
 .cover-stamp:active { scale: .96; }
 @media (prefers-reduced-motion: no-preference) {
-    .cover-glint { animation: cover-twinkle 4s ease-in-out infinite alternate; }
+    .cover-dust { animation: cover-drift 7s ease-in-out infinite alternate; }
+    .cover-dial { animation: cover-revolve 85s linear infinite; }
+    .cover-moon { animation: cover-sway 10s ease-in-out infinite alternate; }
+    .cover-meteor { animation: cover-shoot 11s ease-out infinite; }
     .cover-stamp { transition: transform .2s, scale .15s; }
-    @keyframes cover-twinkle { to { opacity: .45; } }
+    @keyframes cover-drift { from { opacity: .28; } to { opacity: .95; transform: translate(5px, -8px); } }
+    @keyframes cover-revolve { to { transform: rotate(360deg); } }
+    @keyframes cover-sway { from { transform: rotate(-4deg); } to { transform: rotate(4deg); } }
+    @keyframes cover-shoot {
+        0%, 78% { opacity: 0; transform: translate(0, 0); }
+        81% { opacity: .85; }
+        89%, 100% { opacity: 0; transform: translate(119px, -70px); }
+    }
 }
 @media (max-width: 740px) {
     .birthday-cover { padding: 14px; }

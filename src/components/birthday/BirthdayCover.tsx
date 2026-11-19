@@ -1,23 +1,76 @@
 import { ArrowDown, ArrowUpRight, BookOpen, CakeSlice, Flower2 } from "lucide-react";
-import type { MemoryAlbumData } from "@/config/localMemoryAlbum";
 import type { BirthdayConfig } from "@/features/core/store/useBirthdayStore";
 import "./BirthdayCover.css";
 
-const prints = [
-    { id: "14", style: "portrait", caption: "街角的一抹红", alt: "街边的红裙人像" },
-    { id: "23", style: "landscape", caption: "在操场，一起比个耶", alt: "四位同学在操场上比着剪刀手合影" },
-];
+// Stable positions keep the stardust still when the birthday stamp updates.
+const stardust = Array.from({ length: 64 }, (_, i) => ({
+    x: 12 + (i * 113 % 455),
+    y: 12 + (i * 79 % 357),
+    radius: .65 + (i % 4) * .35,
+}));
+
+function MoonDial() {
+    return (
+        <svg className="cover-sky" viewBox="0 0 480 395" aria-hidden="true" focusable="false">
+            <defs>
+                <radialGradient id="bloom-halo">
+                    <stop stopColor="#f7b4cd" stopOpacity=".35" />
+                    <stop offset=".57" stopColor="#cb81d7" stopOpacity=".18" />
+                    <stop offset="1" stopColor="#ac7fe5" stopOpacity="0" />
+                </radialGradient>
+                <linearGradient id="bloom-gold" x2=".84" y2="1">
+                    <stop stopColor="#fff6ce" /><stop offset=".49" stopColor="#f6cc98" />
+                    <stop offset="1" stopColor="#d88c9f" />
+                </linearGradient>
+                <pattern id="bloom-etch" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(32)">
+                    <path d="M0 0V5" stroke="#8f5a74" strokeOpacity=".28" strokeWidth="1" />
+                </pattern>
+                <path id="bloom-crescent" d="M257 92 A97 97 0 1 0 327 224 A84 84 0 0 1 257 92Z" />
+                <path id="bloom-star" d="M0 -12 Q1 -2 9 0 Q1 2 0 12 Q-1 2 -9 0 Q-1 -2 0 -12Z" />
+            </defs>
+            <ellipse cx="240" cy="193" rx="221" ry="184" fill="url(#bloom-halo)" />
+            {stardust.map(({ x, y, radius }, i) => (
+                <circle key={i} className="cover-dust" cx={x} cy={y} r={radius}
+                    fill={i % 3 ? "#f7cfdb" : "#dccbff"} style={{ animationDelay: `-${i % 13}s` }} />
+            ))}
+            <g fill="none" stroke="#e9bea9" strokeWidth=".85">
+                <circle cx="238" cy="185" r="147" opacity=".55" />
+                <circle className="cover-dial" cx="238" cy="185" r="142" strokeWidth="4" strokeDasharray="1 8.3" opacity=".6" />
+                <circle cx="238" cy="185" r="132" opacity=".27" />
+                <ellipse cx="238" cy="185" rx="188" ry="74" transform="rotate(-26 238 185)" opacity=".52" />
+            </g>
+            <g className="cover-moon">
+                <use href="#bloom-crescent" fill="url(#bloom-gold)" />
+                <use href="#bloom-crescent" fill="url(#bloom-etch)" stroke="#ffedc9" strokeWidth="1.1" />
+            </g>
+            <g className="cover-dial" fill="#ffdbbb">
+                <circle cx="238" cy="38" r="3.6" /><circle cx="91" cy="185" r="2.6" />
+                <circle cx="385" cy="185" r="2.2" />
+            </g>
+            <g stroke="#ecc1b1" strokeWidth=".9" fill="none">
+                <path d="M196 326v22m42-16v34m42-40v14" />
+                <path d="m238 365 4 7-4 7-4-7z" fill="#f1cead" />
+            </g>
+            <g fill="#ffe4b3">
+                <use href="#bloom-star" transform="translate(196 350) scale(.45)" />
+                <use href="#bloom-star" transform="translate(280 343) scale(.42)" />
+                <use href="#bloom-star" transform="translate(284 170) scale(1.65)" />
+                <use href="#bloom-star" transform="translate(305 142) scale(.55)" />
+                <use href="#bloom-star" transform="translate(74 106) scale(.8)" />
+                <use href="#bloom-star" transform="translate(397 245)" />
+            </g>
+            <path className="cover-meteor" d="m34 121 37-22" stroke="#ffe4db" strokeWidth="1.3" strokeLinecap="round" />
+        </svg>
+    );
+}
 
 interface CoverProps {
     config: Pick<BirthdayConfig, "name" | "age" | "customMessage" | "showPhotoSection" | "showCakeSection">;
-    album: MemoryAlbumData;
     cakeClicks: number;
     onCakeClick: () => void;
 }
 
-export default function BirthdayCover({ config, album, cakeClicks, onCakeClick }: CoverProps) {
-    const photos = config.showPhotoSection ? prints.filter(print =>
-        album.groups.some(group => group.photos.some(photo => photo.id === print.id))) : [];
+export default function BirthdayCover({ config, cakeClicks, onCakeClick }: CoverProps) {
     const wish = config.customMessage?.replace(/^周昱含，生日快乐[。！]\s*/, "");
 
     return (
@@ -38,14 +91,7 @@ export default function BirthdayCover({ config, album, cakeClicks, onCakeClick }
                         </div>
                     </div>
                     <div className="cover-keepsakes">
-                        <div className="cover-orbits" aria-hidden="true"><i /><i /><i /></div>
-                        <span className="cover-glint" aria-hidden="true">✦</span>
-                        {photos.map(photo => (
-                            <figure className={`cover-print cover-print--${photo.style}`} key={photo.id}>
-                                <img src={`${import.meta.env.BASE_URL}memories/thumb/${photo.id}.webp`} alt={photo.alt} />
-                                <figcaption>{photo.caption}</figcaption>
-                            </figure>
-                        ))}
+                        <MoonDial />
                         <button type="button" className="cover-stamp" onClick={onCakeClick} aria-label="点点蛋糕，收集七次生日惊喜">
                             <CakeSlice size={26} strokeWidth={1.4} />
                             <span aria-live="polite">{cakeClicks ? `还差 ${7 - cakeClicks} 下` : "点点蛋糕"}</span>

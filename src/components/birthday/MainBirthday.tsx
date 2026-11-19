@@ -178,7 +178,7 @@ export const MainBirthday = () => {
       
       {showBirthdayCover ? (
         <Suspense fallback={<header className="min-h-[90svh]" aria-busy="true" />}>
-          <BirthdayCover config={config} album={personalAlbum} cakeClicks={cakeClicks} onCakeClick={handleCakeClick} />
+          <BirthdayCover config={config} cakeClicks={cakeClicks} onCakeClick={handleCakeClick} />
         </Suspense>
       ) : (<motion.header initial="hidden" animate="visible" variants={containerVariants} className="relative min-h-[92vh] flex flex-col items-center justify-center text-center px-4 py-10 overflow-hidden">
         <motion.div style={{ x: springX, y: springY }} className="absolute inset-0 pointer-events-none flex items-center justify-center">
