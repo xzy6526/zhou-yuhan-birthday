@@ -1,0 +1,142 @@
+.birthday-cover {
+    --cream: #fff1df;
+    --blush: #f3b8ca;
+    --ink: #291c31;
+    position: relative;
+    z-index: 10;
+    isolation: isolate;
+    overflow: hidden;
+    padding: clamp(16px, 3vw, 46px);
+    color: var(--cream);
+    background:
+        radial-gradient(ellipse at 77% 33%, #bc709968, transparent 44%),
+        radial-gradient(ellipse at 9% 96%, #73569a85, transparent 55%),
+        linear-gradient(115deg, #211b34 3%, #38233e 58%, #302033);
+    font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+}
+
+.birthday-cover::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    opacity: .62;
+    background-image: radial-gradient(circle, #ffe8cd 0 .8px, transparent 1.4px),
+        radial-gradient(circle, #e6bbd1 0 .65px, transparent 1.3px);
+    background-size: 113px 127px, 173px 157px;
+    background-position: 16px 25px, 68px 97px;
+    mask-image: linear-gradient(120deg, #000, transparent 36%, #000 78%);
+}
+
+.cover-card {
+    position: relative;
+    max-width: 1450px;
+    margin: auto;
+    padding: clamp(21px, 2.6vw, 40px) clamp(25px, 5vw, 78px) clamp(32px, 4vw, 60px);
+    border: 1px solid #dcb99858;
+}
+
+.cover-card::before, .cover-card::after {
+    content: "✧";
+    position: absolute;
+    color: #dfb797;
+    font: 21px/1 Georgia, serif;
+}
+.cover-card::before { top: -.53em; left: -.5em; }
+.cover-card::after { bottom: -.52em; right: -.5em; }
+
+.cover-letterhead {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #e2c3ac;
+    font-size: 12px;
+    letter-spacing: .18em;
+}
+.cover-letterhead i { flex: 1; height: 1px; background: linear-gradient(90deg, #d8b89b66, #d8b89b1f); }
+
+.cover-spread {
+    display: grid;
+    grid-template-columns: 1fr 1.04fr;
+    align-items: center;
+    gap: min(4vw, 55px);
+    max-width: 1140px;
+    min-height: clamp(465px, 67svh, 740px);
+    margin: auto;
+    padding-block: 28px 14px;
+}
+.cover-letter { position: relative; z-index: 1; }
+.cover-to, #cover-title { font-family: "Songti SC", "STSong", "SimSun", "Noto Serif CJK SC", serif; }
+.cover-to { margin: 0 0 .65em; color: #f4d8c8; font-size: clamp(20px, 2vw, 31px); letter-spacing: .07em; }
+#cover-title { margin: 0; color: var(--cream); font-size: clamp(56px, 6.3vw, 98px); font-weight: 600; line-height: 1.12; letter-spacing: .025em; }
+.cover-script {
+    width: fit-content;
+    margin: -.06em 0 .45em .1em;
+    color: var(--blush);
+    font: normal clamp(32px, 3.65vw, 58px)/1.4 "Snell Roundhand", "Segoe Script", "Brush Script MT", cursive;
+    letter-spacing: -.065em;
+    transform: rotate(-6deg);
+}
+.cover-wish { max-width: 21em; margin: 1.5em 0; color: #e7d8df; font-size: clamp(15px, 1.18vw, 19px); line-height: 1.95; white-space: pre-line; overflow-wrap: anywhere; }
+.cover-links { display: flex; align-items: center; flex-wrap: wrap; gap: 12px 22px; }
+.cover-links a {
+    display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+    min-height: 45px; padding: 0 3px; color: var(--cream); font-size: 14px; text-decoration: none;
+    border-bottom: 1px solid #e0b8bc80;
+}
+.cover-links a[href="#cake-section"] { padding: 0 21px; color: var(--ink); background: #f6ccca; border-radius: 7px; border: 0; font-weight: 600; }
+.cover-links a:hover { filter: brightness(1.12); }
+.cover-links a:focus-visible, .cover-stamp:focus-visible { outline: 3px solid #fff0d0; outline-offset: 5px; }
+
+.cover-keepsakes { position: relative; width: 100%; max-width: 560px; aspect-ratio: 1.19; justify-self: center; }
+.cover-orbits, .cover-orbits i { position: absolute; pointer-events: none; }
+.cover-orbits { inset: 2% -3%; }
+.cover-orbits i { inset: 3% 2%; border: 1px solid #ddc5a950; border-radius: 50%; transform: rotate(-24deg); }
+.cover-orbits i:nth-child(2) { inset: 13% -5%; transform: rotate(-32deg); border-style: dashed; opacity: .55; }
+.cover-orbits i:nth-child(3) { inset: 13% 4%; transform: rotate(25deg); opacity: .55; }
+.cover-glint { position: absolute; top: 16%; left: 10%; color: #f2c79d; font: 32px/1 Georgia, serif; text-shadow: 12px 16px 0 #dbaec180; }
+.cover-print {
+    position: absolute;
+    margin: 0; padding: 2% 2% 1%;
+    background: linear-gradient(120deg, #fdf5e6, #efdfcc);
+    box-shadow: 1px 3px 2px #160d1b33, 5px 15px 27px #160d1b66;
+    color: #533e43;
+}
+.cover-print img { display: block; width: 100%; height: auto; }
+.cover-print figcaption { padding: .42em 0 .28em; text-align: center; font: clamp(12px, 1.2vw, 18px)/1.45 "Kaiti SC", "STKaiti", "KaiTi", serif; }
+.cover-print--portrait { width: 52%; right: 8%; top: 0; transform: rotate(8deg); }
+.cover-print--portrait figcaption { padding-inline-start: 22%; }
+.cover-print--landscape { width: 53%; left: 0; bottom: 0; transform: rotate(-9deg); }
+.cover-print--landscape::before {
+    content: ""; position: absolute; width: 31%; height: 9%; left: 27%; top: -4%; transform: rotate(4deg);
+    background: repeating-linear-gradient(120deg, #e9beabdf 0 3px, #f3ccbbce 3px 6px);
+    clip-path: polygon(2% 0,100% 0,98% 28%,100% 48%,97% 75%,99% 100%,0 100%,2% 72%,0 45%);
+}
+.cover-stamp {
+    position: absolute; right: 0; top: -2%; z-index: 1; width: clamp(60px, 6vw, 86px); aspect-ratio: 1;
+    display: grid; place-content: center; justify-items: center; gap: 3px;
+    color: #67334c; background: radial-gradient(ellipse at 35% 26%, #f3cfcb, #dc9da7 70%, #eabab7);
+    border: 3px double #af7185; border-radius: 44% 51% 45% 48%;
+    outline-offset: 4px; box-shadow: inset 0 0 0 3px #f4d1c3aa, 1px 3px 5px #2c142d55;
+    transform: rotate(10deg); cursor: pointer;
+}
+.cover-stamp span { font-size: 10px; letter-spacing: .05em; }
+.cover-stamp:hover { transform: rotate(4deg); }
+.cover-stamp:active { scale: .96; }
+@media (prefers-reduced-motion: no-preference) {
+    .cover-glint { animation: cover-twinkle 4s ease-in-out infinite alternate; }
+    .cover-stamp { transition: transform .2s, scale .15s; }
+    @keyframes cover-twinkle { to { opacity: .45; } }
+}
+@media (max-width: 740px) {
+    .birthday-cover { padding: 14px; }
+    .cover-card { padding: 20px clamp(17px, 5vw, 36px) 26px; }
+    .cover-spread { grid-template-columns: 1fr; gap: 24px; min-height: 0; padding-block: 28px 4px; }
+    .cover-to { font-size: 20px; }
+    #cover-title { font-size: clamp(49px, 11.5vw, 72px); }
+    .cover-script { font-size: clamp(34px, 8vw, 48px); }
+    .cover-wish { margin: 18px 0; }
+    .cover-keepsakes { max-width: 440px; width: 94%; }
+    .cover-stamp { width: 57px; gap: 0; }
+    .cover-stamp svg { width: 20px; }
+}

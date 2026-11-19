@@ -25,6 +25,7 @@ import { SoundToggle } from "./SoundToggle";
 import { getTemplateEmojiKit, normalizeToEmoji } from "@/config/emojiKits";
 
 const BirthdayMemoryAlbum = lazy(() => import("./BirthdayMemoryAlbum"));
+const BirthdayCover = lazy(() => import("./BirthdayCover"));
 
 export const MainBirthday = () => {
     const [visible, setVisible] = useState(false);
@@ -43,6 +44,8 @@ export const MainBirthday = () => {
     const { config } = useBirthdayStore();
     const { t, isHindi, isBengali, isFrench, isChinese } = useTranslation();
     const { name, age, relationship, favoriteColor, senderName } = config;
+    const personalAlbum = name === "周昱含" && !config.photos?.length ? localMemoryAlbum : undefined;
+    const showBirthdayCover = !!personalAlbum && isChinese;
     const isMobile = useIsMobile();
     const reduceMotion = useReducedMotion();
     const shouldAnimate = !isMobile && !reduceMotion;
@@ -156,14 +159,14 @@ export const MainBirthday = () => {
     };
     const sparkleCount = isMobile ? 4 : 6;
     const balloonCount = isMobile ? 4 : 6;
-    return (<div onMouseMove={shouldAnimate ? handleMouseMove : undefined} className={`min-h-screen transition-opacity duration-1000 w-full max-w-[100vw] overflow-x-hidden ${visible ? "opacity-100" : "opacity-0"} ${megaSurprise ? "animate-screen-shake" : ""}`} style={{ background: 'transparent' }}>
+    return (<div onMouseMove={shouldAnimate && !showBirthdayCover ? handleMouseMove : undefined} className={`min-h-screen transition-opacity duration-1000 w-full max-w-[100vw] overflow-x-hidden ${visible ? "opacity-100" : "opacity-0"} ${megaSurprise ? "animate-screen-shake" : ""}`} style={{ background: 'transparent' }}>
       <SoundToggle />
       <Balloons count={balloonCount}/>
       <Sparkles count={sparkleCount}/>
 
       
       {megaSurprise && (<div className="fixed inset-0 z-[100] bg-white/20 backdrop-blur-sm pointer-events-none animate-flash flex items-center justify-center">
-          <p role="status" aria-live="assertive" className="text-6xl md:text-9xl font-black text-white drop-shadow-2xl animate-bounce">MEGA SURPRISE! 🎊</p>
+          <p role="status" aria-live="assertive" className="text-6xl md:text-9xl font-black text-white drop-shadow-2xl animate-bounce">{isChinese ? "愿你天天开心！" : "MEGA SURPRISE!"} 🎊</p>
         </div>)}
 
       <AnimatePresence>
@@ -173,7 +176,11 @@ export const MainBirthday = () => {
       </AnimatePresence>
 
       
-      <motion.header initial="hidden" animate="visible" variants={containerVariants} className="relative min-h-[92vh] flex flex-col items-center justify-center text-center px-4 py-10 overflow-hidden">
+      {showBirthdayCover ? (
+        <Suspense fallback={<header className="min-h-[90svh]" aria-busy="true" />}>
+          <BirthdayCover config={config} album={personalAlbum} cakeClicks={cakeClicks} onCakeClick={handleCakeClick} />
+        </Suspense>
+      ) : (<motion.header initial="hidden" animate="visible" variants={containerVariants} className="relative min-h-[92vh] flex flex-col items-center justify-center text-center px-4 py-10 overflow-hidden">
         <motion.div style={{ x: springX, y: springY }} className="absolute inset-0 pointer-events-none flex items-center justify-center">
           <div className="w-[150%] h-[150%] bg-[radial-gradient(circle,var(--color-primary)_0%,transparent_70%)] opacity-[0.05]"/>
         </motion.div>
@@ -222,7 +229,7 @@ export const MainBirthday = () => {
             </span>
           ))}
         </motion.div>
-      </motion.header>
+      </motion.header>)}
 
       
       
@@ -242,8 +249,8 @@ export const MainBirthday = () => {
       </section>)}
 
       {config.showPhotoSection && (
-        name === "周昱含" && localMemoryAlbum && !config.photos?.length
-          ? <Suspense><BirthdayMemoryAlbum album={localMemoryAlbum} /></Suspense>
+        personalAlbum
+          ? <Suspense fallback={<div id="memories" aria-busy="true" />}><BirthdayMemoryAlbum album={personalAlbum} /></Suspense>
           : <PhotoGallery />
       )}
 
