@@ -25,6 +25,7 @@ import { getTemplateEmojiKit, normalizeToEmoji } from "@/config/emojiKits";
 
 const BirthdayMemoryAlbum = lazy(() => import("./BirthdayMemoryAlbum"));
 const BirthdayCover = lazy(() => import("./BirthdayCover"));
+const BirthdayMessageWall = lazy(() => import("./BirthdayMessageWall"));
 
 export const MainBirthday = () => {
     const [visible, setVisible] = useState(false);
@@ -371,6 +372,8 @@ export const MainBirthday = () => {
       
 
       {config.showFinalSurprise && <FinalSurprise />}
+
+      {name === "周昱含" && <Suspense><BirthdayMessageWall /></Suspense>}
 
       <footer className="relative z-20 text-center py-20 bg-gradient-to-t from-black/60 to-transparent w-full">
         <p className="text-white/30 text-sm tracking-[0.15em]">

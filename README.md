@@ -5,6 +5,7 @@
 ## 当前进度
 
 - 页面分享弹窗及底部两个分享入口已移除。
+- 页面最后、页脚之前增加「想对你说」留言墙，采用纸卡错落排版。当前展示已有的生日祝福，后续由用户提供正文和署名后更新本地留言清单并重新构建。
 
 - 本地预览已接入简体中文开场、祝福语、回忆相册和信封。
 - 点开后，爱心与逐字祝福在蓝紫和玫瑰粉的星云中出现。开场与主贺卡共用星云纹理，开场中央压低亮度，突出爱心和文字。
@@ -45,6 +46,7 @@ npm run build
 - 收件人、祝福和信件在 [.env](.env)。贺卡封面的月牙和星尘在 [BirthdayCover.tsx](src/components/birthday/BirthdayCover.tsx)，排版在 [BirthdayCover.css](src/components/birthday/BirthdayCover.css)。
 - 生日蛋糕在 [项目内的 HTML 副本](public/cake/birthday-cake-demo.html)，原文件保存在下载目录。
 - 当前相册清单在 `src/config/memory-album.local.json`。可为对应照片加 `caption` 字段填写回忆，也可以调整照片顺序、精选编号及各组的 `layout`。
+- 留言墙在 `src/components/birthday/BirthdayMessageWall.tsx`。新增正式留言时创建 `src/config/messages.local.json`，按展示顺序存入 `[{"id":"note-001","text":"留言正文","author":"署名"}]`。其中 `author` 可省略，`id` 应唯一。缺少清单时展示当前生日祝福，空数组展示等待留言的文案。清单已加入 Git 忽略，文字随构建一起交付。修改后运行 `npm run build`。
 - `public/memories/` 保存浏览大图用的 WebP 和 `thumb/` 缩略图。素材、相册清单与本地编译产物都放在项目目录内，照片和清单由 Git 忽略。源照片仍在桌面。修改后执行 `npm run build`，再用启动器预览。
 - 如需改用 Birthday Bloom 原来的轮播，可以在根目录用 `.env.local` 指定照片。
 
@@ -56,6 +58,8 @@ VITE_PHOTO_CAPTIONS="第一张的回忆|第二张的回忆"
 `npm run verify` 执行类型检查、ESLint、构建和测试。编译产物在 `dist/`。
 
 ## 验证记录
+
+- 留言墙通过类型检查、构建、ESLint 和现有 481 项测试。Edge 在 320、390、1440 像素宽度检查了末尾位置、默认祝福和长文本边界，并临时追加卡片检查多条布局。正式留言内容待用户提供。
 
 - 照片墙竖直版已构建，并在 Edge 的 390 和 1440 像素宽度验证正向排列、流动、暂停恢复和横向边界。
 
@@ -79,7 +83,12 @@ VITE_PHOTO_CAPTIONS="第一张的回忆|第二张的回忆"
 - Windows 启动器已在本机运行。用 Edge 验证了首页、跳过开场、蛋糕加载和许愿交互。
 - 在 Edge 桌面与模拟手机尺寸检验了真实照片的分组、照片墙动画偏好、缩略图载入、原比例大图、前后翻页和关闭后焦点恢复。核对构建包含 54 张原比例浏览图及其缩略图。三组各自的拍立得、胶片和杂志版式，以及组内大图翻页，也已在这两个尺寸复测。手机真机验收待做。
 
-最后更新于 2026-11-20。
+## 留言墙参考
+
+- uiX 的 [Masonry](https://site.txbai.com/reactbits/components/masonry) 与 [Social Proof 14](https://site.txbai.com/reactbits/pro/social-proof-14) 提供错落卡片的视觉参考。根据公开元数据设计，用原生 CSS columns 和项目现有图标实现。
+- GitHub 的 [Waline](https://github.com/walinejs/waline) 与 [giscus](https://github.com/giscus/giscus) 可用于在线评论服务。当前采用用户确认的手动收集正文、补进静态页面的方式。
+
+最后更新于 2026-11-22。
 
 ---
 

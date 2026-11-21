@@ -1,0 +1,72 @@
+.message-wall {
+    position: relative;
+    z-index: 20;
+    isolation: isolate;
+    padding: 80px 24px 64px;
+    color: #f8eddf;
+    background:
+        radial-gradient(ellipse at 50% 32%, #77516d50, transparent 64%),
+        linear-gradient(#15112166, #100d1c);
+    scroll-margin-top: 24px;
+}
+
+.message-wall::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: .35;
+    background-image: radial-gradient(circle, #d6bddb 0 .7px, transparent 1px);
+    background-size: 83px 101px;
+    mask-image: linear-gradient(transparent, #000, transparent);
+}
+
+.message-wall__heading { text-align: center; margin: 0 auto 48px; }
+.message-wall__ornament { display: flex; align-items: center; justify-content: center; gap: 14px; color: #dab5bb; }
+.message-wall__ornament i { width: 42px; height: 1px; background: linear-gradient(90deg, transparent, #dab5bb88, transparent); }
+.message-wall__eyebrow { margin: 24px 0 14px; color: #d8bac8; font-size: 12px; letter-spacing: .35em; }
+.message-wall h2 { margin: 0; font: 400 clamp(38px, 5vw, 64px)/1.3 "Songti SC", "SimSun", serif; letter-spacing: .12em; }
+.message-wall__subtitle { margin: 18px 0 0; color: #d3c2d4; font-size: 14px; line-height: 1.8; }
+.message-wall__notes { max-width: 1080px; margin: auto; columns: 3 280px; column-gap: 26px; }
+.message-wall__notes:has(.message-note:only-child) { max-width: 480px; columns: 1; }
+
+.message-note {
+    position: relative;
+    break-inside: avoid;
+    margin: 12px 0 32px;
+    padding: 34px 30px 24px;
+    color: #44313f;
+    border: 1px solid #fff0db;
+    border-radius: 3px 3px 24px 3px;
+    background: linear-gradient(140deg, #fff8eb, #f0e3d1);
+    box-shadow: 0 15px 35px #06030d40;
+}
+.message-note:nth-child(3n + 2) { background: linear-gradient(140deg, #fdf0ef, #ecd8df); }
+.message-note:nth-child(3n) { background: linear-gradient(140deg, #f5f0fc, #e3ddee); }
+.message-note__tape {
+    position: absolute; top: -10px; left: calc(50% - 31px); width: 62px; height: 21px;
+    background: repeating-linear-gradient(120deg, #d7b8b6b0 0 3px, #f0d2bcb8 3px 6px);
+    transform: rotate(-3deg);
+}
+.message-note__quote { color: #a47a82; }
+.message-note__text {
+    margin: 20px 0 28px;
+    font: 400 18px/1.95 "Kaiti SC", "STKaiti", "KaiTi", serif;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+.message-note__signature { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-top: 16px; border-top: 1px solid #a783822b; color: #815d6c; font-size: 13px; overflow-wrap: anywhere; }
+.message-note__signature span { min-width: 0; }
+.message-note__signature svg { flex-shrink: 0; }
+.message-wall__empty { text-align: center; color: #dac7d8; line-height: 2; padding-block: 24px; }
+.message-wall__closing { display: flex; flex-direction: column; align-items: center; gap: 18px; text-align: center; margin: 48px 0 0; color: #c7afc4; font: 14px/1.8 "Songti SC", "SimSun", serif; letter-spacing: .1em; }
+.message-wall__closing span { color: #dcbdaf; font-size: 26px; }
+
+@media (max-width: 620px) {
+    .message-wall { padding: 60px 24px 40px; }
+    .message-wall__notes { columns: 1; }
+    .message-wall__heading { margin-bottom: 36px; }
+    .message-note { padding: 30px 26px 22px; }
+    .message-wall__subtitle { font-size: 13px; }
+}
