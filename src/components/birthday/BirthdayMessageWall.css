@@ -57,7 +57,7 @@
     overflow-wrap: anywhere;
 }
 .message-note__signature { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-top: 16px; border-top: 1px solid #a783822b; color: #815d6c; font-size: 13px; overflow-wrap: anywhere; }
-.message-note__signature span { min-width: 0; }
+.message-note__signature span { min-width: 0; font-family: "Microsoft YaHei", "PingFang SC", sans-serif; }
 .message-note__signature svg { flex-shrink: 0; }
 .message-wall__empty { text-align: center; color: #dac7d8; line-height: 2; padding-block: 24px; }
 .message-wall__closing { display: flex; flex-direction: column; align-items: center; gap: 18px; text-align: center; margin: 48px 0 0; color: #c7afc4; font: 14px/1.8 "Songti SC", "SimSun", serif; letter-spacing: .1em; }
