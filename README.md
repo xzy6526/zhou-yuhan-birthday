@@ -4,7 +4,7 @@
 
 ## 当前进度
 
-- 2026-11-22 用户曾确认 v6 蛋糕可显示、旋转和许愿，随后再次反馈 iPhone/Safari 照片和蛋糕卡死；v6 不视为稳定通过。v7 着重减少苹果设备持续计算、初始加载与缩略图压力；实机稳定性尚待复测。蛋糕保留 Three.js 模型，Mac 使用 WebGL，iPhone 保留先前已能显示模型的 Canvas 兼容路径。
+- 2026-11-22 用户曾确认 v6 蛋糕可显示、旋转和许愿，随后再次反馈 iPhone/Safari 照片和蛋糕卡死；v6 不视为稳定通过。v7 已发布，代码检查、Pages 部署及正式站的手机/桌面性能自动化通过，实际 iPhone/Mac 稳定性尚待复测。蛋糕保留 Three.js 模型，Mac 使用 WebGL，iPhone 保留先前已能显示模型的 Canvas 兼容路径。
 - 页面分享弹窗及底部两个分享入口已移除。
 - 页面最后、页脚之前增加「想对你说」留言墙，采用叠放信笺，点封口后逐封阅读，支持回看和读完后重读。已收录 2 条亲友留言，并按用户要求补写 10 条「生日寄语」，共 12 张。亲友原话和署名保留，后续留言继续追加到本地清单并重新构建。
 
@@ -71,6 +71,9 @@ VITE_PHOTO_CAPTIONS="第一张的回忆|第二张的回忆"
 - v7 将 137 张照片的 WebP/JPEG 缩略图从合计 11,068,126 字节降到 6,312,084 字节，约减少 43%；原尺寸浏览图未改。图片导入的尺寸、方向、EXIF 与失败回滚回归通过。沙箱临时目录重命名曾返回 Windows 设备错误，改在隔离的沙箱外临时目录重跑后通过。
 - v7 Edge 与 WebKit 均通过：不触发 IntersectionObserver 时的首次绘制、零宽恢复、三组大图与末张加载；iPhone 标识使用正常动画模式，旋转和吹蜡烛后实际画布像素更新。WebKit 1440×900、2 倍设备像素比自然播放完整开场，随后验证 WebGL 蛋糕、三轮三组大图与返回蛋糕，未发现页面运行错误。内置 Browser 缺少运行时模块，因此使用隔离 Playwright；以上不是实际 Mac/iPhone 设备验收。
 - v7 最终本地 `npm run verify` 通过：27 份测试文件、485 项测试，保留 2 条原有 ESLint 警告。新增照片队列并发上限与超时释放回归。性能脚本同时验证实际三维模型和辉光合成保持缓存，Mac 模式静置只绘制轻量星轨，iPhone 模式静置为零次绘制。待发布后进行正式站检查，并等待实际 iPhone/Mac 反馈。
+- v7 正式站发布完成：代码 `1b33391`、Pages `c4a06c0`。正式 HTTPS 站在手机标识下静置绘制为 0，在 Mac 标识下实际三维模型重绘为 0，仅轻量星轨持续绘制；重复尺寸事件均未重建背景。CI 初次仍是原有主题 5ms 计时预算波动（6.27ms）失败，未改阈值，复跑通过。已发出 v7 实机回归问题，等待用户反馈。完整开场入口为 `https://xzy6526.github.io/zhou-yuhan-birthday/?v=20261122-7`。
+
+本轮修改文件：`public/cake/birthday-cake-demo.html`、`public/media-check.html`、`src/components/birthday/MainBirthday.tsx`、`src/components/birthday/BirthdayMemoryAlbum.tsx`、`scripts/add-photos.py`、`scripts/test_add_photos.py`、`scripts/check-mobile-media.mjs`、`scripts/check-mobile-media-performance.mjs`、`src/test/memory_image_loading.test.tsx`、本 README，以及由 Git 忽略、随 Pages 发布的 `public/memories/thumb/` 274 个缩略图文件。
 
 - 2026-11-22 用户反馈 v4 蛋糕仍空白，照片可显示但非常慢，故此前浏览器自动化通过不代表真机故障已解决。对比发现原生懒加载在 WebKit 自动化中仍请求全部 137 张，故 v5 最终使用滚动位置明确控制网格图片源，并恢复较小的 WebP 优先。蛋糕检测页现在实际运行相同 sandbox 的 iframe，记录脚本、渲染器、模型、首帧或异常步骤；尚待手机检测结果，未宣称蛋糕已修复。
 - v5 `npm run verify`：27 份文件、483 项测试通过，保留 2 条原有 ESLint 警告。Edge 与 WebKit 验证关闭 JavaScript 可见性回调时仍能绘制蛋糕、零宽后恢复、吹蜡烛与打开三组大图。内置 Browser 运行时缺少 `browser-service.mjs`，本次用本地 Playwright 验证。
