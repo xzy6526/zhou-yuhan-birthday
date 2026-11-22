@@ -2,7 +2,7 @@
   "name": "Birthday Bloom",
   "short_name": "Birthday Bloom",
   "description": "Magical cinematic 3D birthday surprise web application with physics-based cake cutting, customizable memories, and multilingual celebrations.",
-  "start_url": "/",
+  "start_url": "./",
   "display": "standalone",
   "orientation": "any",
   "theme_color": "#1a0515",
@@ -17,13 +17,13 @@
   "prefer_related_applications": false,
   "icons": [
     {
-      "src": "/icon-192x192.png?v=2",
+      "src": "./icon-192x192.png?v=2",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/icon-512x512.png?v=2",
+      "src": "./icon-512x512.png?v=2",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
@@ -34,10 +34,10 @@
       "name": "Romantic Surprise",
       "short_name": "Romantic",
       "description": "Open romantic birthday celebration template",
-      "url": "/?template=romantic",
+      "url": "./?template=romantic",
       "icons": [
         {
-          "src": "/icon-192x192.png?v=2",
+          "src": "./icon-192x192.png?v=2",
           "sizes": "192x192"
         }
       ]
@@ -46,10 +46,10 @@
       "name": "Friend Celebration",
       "short_name": "Friend",
       "description": "Open energetic friend party celebration template",
-      "url": "/?relationship=friend",
+      "url": "./?relationship=friend",
       "icons": [
         {
-          "src": "/icon-192x192.png?v=2",
+          "src": "./icon-192x192.png?v=2",
           "sizes": "192x192"
         }
       ]
@@ -58,10 +58,10 @@
       "name": "Family Celebration",
       "short_name": "Family",
       "description": "Open warm family birthday celebration template",
-      "url": "/?relationship=family",
+      "url": "./?relationship=family",
       "icons": [
         {
-          "src": "/icon-192x192.png?v=2",
+          "src": "./icon-192x192.png?v=2",
           "sizes": "192x192"
         }
       ]
@@ -69,7 +69,7 @@
   ],
   "screenshots": [
     {
-      "src": "/og-image.jpg",
+      "src": "./og-image.jpg",
       "sizes": "1200x630",
       "type": "image/jpeg",
       "form_factor": "wide",

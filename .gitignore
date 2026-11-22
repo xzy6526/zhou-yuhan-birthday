@@ -31,3 +31,4 @@ dist-ssr
 /public/memories/
 /src/config/memory-album.local.json
 /src/config/messages.local.json
+/dist-pages/

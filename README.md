@@ -17,6 +17,12 @@
 
 ## 运行预览
 
+正式网站已配置在 GitHub Pages，访问 [周昱含生日页](https://xzy6526.github.io/zhou-yuhan-birthday/)。入口从开场动画播放。公开站点中的照片和留言可由访问者查看。
+
+GitHub 仓库为 [xzy6526/zhou-yuhan-birthday](https://github.com/xzy6526/zhou-yuhan-birthday)。`main` 分支保存代码，`gh-pages` 分支保存编译后的网页、照片和留言。项目内的 `birthday` Git remote 指向这个仓库。
+
+后续更新内容时，本地执行 `npm run build:pages`，将 `dist-pages/` 的内容发布到 `birthday` remote 的 `gh-pages` 分支。Pages 从该分支的根目录部署。`dist-pages/` 使用 `/zhou-yuhan-birthday/` 路径，普通 `npm run build` 仍生成本地 `dist/`。
+
 Windows 下，双击项目目录里的 [打开生日页.cmd](打开生日页.cmd)。它会启动已构建的生日页并打开默认浏览器。预览期间请保留启动窗口。已经启动时，可以直接打开 [生日页](http://127.0.0.1:4174/)。
 
 修改配置后，可用开发模式即时查看变化。
