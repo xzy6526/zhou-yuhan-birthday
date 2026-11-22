@@ -20,6 +20,14 @@ p{margin:0;color:#aea1c0;font-size:11px;letter-spacing:1px}button{pointer-events
 <header><small>给周昱含</small><h1>送你一颗小宇宙</h1></header>
 <footer><p>拖动蛋糕，可以看见背面的花纹</p><div class="cake-actions"><button id="wish">许愿后，吹灭蜡烛</button><button id="reset">重置视角</button></div><p id="wish-note" role="status"></p></footer><div id="error"></div>
 <script>
+window.cakeReport = function(stage) {
+  window.parent.postMessage({type:'birthday-cake-status',stage:stage},'*');
+};
+window.addEventListener('error',function(event){window.cakeReport('脚本错误：'+event.message+' @'+event.lineno+':'+event.colno);});
+window.addEventListener('unhandledrejection',function(event){window.cakeReport('异步错误：'+String(event.reason));});
+window.cakeReport('脚本开始执行');
+</script>
+<script>
 console.warn('Scripts "build/three.js" and "build/three.min.js" are deprecated with r150+, and will be removed with r160. Please use ES Modules or alternatives: https://threejs.org/docs/index.html#manual/en/introduction/Installation'),
 /**
  * @license
@@ -571,7 +579,9 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
   class GalaxyCakeScene {
     constructor(host) {
       this.host=host;this.rotation=new root.CakeRotation();this.disposed=false;this.visible=true;
+      root.cakeReport('开始创建渲染器，尺寸 '+host.clientWidth+'×'+host.clientHeight);
       try { this.renderer=new T.WebGLRenderer({alpha:true,antialias:true,preserveDrawingBuffer:true}); } catch(e) { this.renderer=new root.SoftwareCakeRenderer(); }
+      root.cakeReport(this.renderer.software?'使用软件渲染器':'WebGL 渲染器已创建');
       this.renderer.setPixelRatio(Math.min(devicePixelRatio,2));this.renderer.outputColorSpace=T.SRGBColorSpace;
       this.renderer.toneMapping=T.ACESFilmicToneMapping;this.renderer.toneMappingExposure=1.08;
       this.renderer=new root.DreamCakeRenderer(this.renderer);
@@ -581,7 +591,9 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
       this.canvas.dataset.renderer=this.renderer.software?'Three.js geometry · Canvas fallback':'Three.js WebGL';host.append(this.canvas);
       this.scene=new T.Scene();this.camera=new T.PerspectiveCamera(39,1,.1,100);
       this.rig=new T.Group();this.rig.name='pointer-controlled-cake';this.scene.add(this.rig);
+      root.cakeReport('开始建立蛋糕模型与纹理');
       this.glowMap=radialTexture();this.starGeo=starGeometry();this.makeLights();this.makeCake();this.makeCandle();this.makeOrbits();this.makeParticles();this.bindPointer();
+      root.cakeReport('模型完成，开始背景与首次绘制');
       this.lightsFX=new root.Starlight();
       this.effectCanvas=canvas(1,1);this.effectCanvas.setAttribute('aria-hidden','true');
       Object.assign(this.effectCanvas.style,{position:'absolute',inset:'0',pointerEvents:'none'});
@@ -782,6 +794,7 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
 function bootCake() {
   const host = document.getElementById('scene');
   if(!host.clientWidth || !host.clientHeight){requestAnimationFrame(bootCake);return;}
+  window.cakeReport('模型库 '+(window.THREE?.REVISION || '未加载'));
 try {
   const cake = new GalaxyCakeScene(host);
   document.getElementById('reset').addEventListener('click', () => cake.resetView());
@@ -796,8 +809,9 @@ try {
     wishNote.textContent = lit ? '' : '愿望交给星星啦。周昱含，生日快乐！';
   });
   document.body.classList.add('ready');
+  window.cakeReport('蛋糕首次绘制完成，画布 '+cake.canvas.width+'×'+cake.canvas.height);
 }
-catch(e){const el=document.getElementById('error');el.style.display='block';el.textContent='3D 交互未能启动，已保留静态预览。请换一个支持 3D 的浏览器打开。';console.error(e);}
+catch(e){window.cakeReport('启动失败：'+String(e)+' '+(e.stack||''));const el=document.getElementById('error');el.style.display='block';el.textContent='蛋糕交互暂未启动，可以先欣赏静态蛋糕。';console.error(e);}
 }
 bootCake();
 </script><!-- Three.js MIT license
