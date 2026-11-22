@@ -2,11 +2,19 @@ import assert from "node:assert/strict";
 import { chromium, webkit } from "playwright";
 
 const url = process.argv[2] || "http://127.0.0.1:4174/?phase=main";
+const recordCake = () => {
+    let Scene;
+    Object.defineProperty(window, "GalaxyCakeScene", {
+        get() { return Scene; },
+        set(Type) { Scene = class extends Type { constructor(...args) { super(...args); window.testCake = this; } }; },
+    });
+};
 for (const engine of [chromium, webkit]) {
     const browser = await engine.launch(engine === chromium ? { channel: "msedge" } : {});
     try {
         const page = await browser.newPage({ viewport: { width: 402, height: 800 }, isMobile: true, hasTouch: true });
         page.setDefaultTimeout(20000);
+        await page.addInitScript(recordCake);
         const photoRequests = new Set();
         page.on("request", request => {
             if (request.url().includes("/memories/")) photoRequests.add(request.url());
@@ -28,9 +36,8 @@ for (const engine of [chromium, webkit]) {
             "Offscreen photos must not download before scrolling, even without native lazy loading");
         assert.ok(photoRequests.size < 40, "The initial page must not request the entire album");
         console.log(engine.name() + " initial unique photo requests: " + photoRequests.size);
-        const painted = () => frame.locator("#cake-canvas").evaluate(canvas =>
-            canvas.getContext("2d").getImageData(0, 0, canvas.width, canvas.height).data
-                .some((value, i) => i % 4 === 3 && value > 0));
+        const painted = () => frame.locator("#cake-canvas").evaluate(() =>
+            window.testCake.renderer.info.render.frame > 0 && window.testCake.renderer.info.render.triangles > 0);
         assert.ok(await painted(), "The cake must draw even when visibility observers never fire");
         await frame.locator("#scene").evaluate(host => {
             host.style.width = "0px";
@@ -64,6 +71,7 @@ for (const engine of [chromium, webkit]) {
             reducedMotion: "no-preference",
         });
         phone.setDefaultTimeout(20000);
+        await phone.addInitScript(recordCake);
         await phone.addInitScript(() => {
             window.webglAttempts = 0;
             const original = HTMLCanvasElement.prototype.getContext;
@@ -80,9 +88,10 @@ for (const engine of [chromium, webkit]) {
         const compatible = phone.frameLocator('iframe[title*="蛋糕"]');
         await phone.getByRole("link", { name: "去许愿" }).click();
         await compatible.locator("body.ready").waitFor();
-        assert.equal(await compatible.locator("body").evaluate(() => window.webglAttempts), 0,
-            "iPhone must not create the potentially hanging WebGL context");
-        assert.match(await compatible.locator("#cake-canvas").getAttribute("data-renderer"), /Canvas fallback/);
+        assert.ok(await compatible.locator("body").evaluate(() => window.webglAttempts) > 0,
+            "iPhone must use the real-device-verified native WebGL renderer");
+        assert.match(await compatible.locator("#cake-canvas").getAttribute("data-renderer"), /WebGL.*native/);
+        assert.ok(await compatible.locator("body").evaluate(() => window.testCake.renderer.info.render.calls) < 50);
         const canvas = compatible.locator("#cake-canvas");
         const yaw = await canvas.getAttribute("data-yaw");
         const box = await canvas.boundingBox();
@@ -92,13 +101,13 @@ for (const engine of [chromium, webkit]) {
         await phone.mouse.up();
         assert.notEqual(await canvas.getAttribute("data-yaw"), yaw);
         await canvas.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
-        const litPixels = await canvas.evaluate(element => element.toDataURL());
+        const litTriangles = await canvas.evaluate(() => window.testCake.renderer.info.render.triangles);
         await compatible.locator("#wish").click();
         assert.match(await compatible.locator("#wish").innerText(), /再点亮/);
         await canvas.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
-        assert.notEqual(await canvas.evaluate(element => element.toDataURL()), litPixels,
-            "Blowing out the candle must repaint the software canvas");
-        console.log(engine.name() + " passed: iPhone Canvas mode, no WebGL, rotation and candle");
+        assert.ok(await canvas.evaluate(() => window.testCake.renderer.info.render.triangles) < litTriangles,
+            "Blowing out the candle must remove its geometry from the actual WebGL draw list");
+        console.log(engine.name() + " passed: iPhone native WebGL budget, rotation and candle");
         await phone.close();
         if (engine === webkit) {
             const desktop = await browser.newPage({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 2, reducedMotion: "no-preference" });

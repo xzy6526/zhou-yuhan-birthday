@@ -14,10 +14,10 @@ body{margin:0;padding:24px;background:#171125;color:#f6e9ef;font:16px/1.7 system
 <pre id="progress">正在检测…</pre>
 <button id="copy" type="button">复制检测结果</button>
 <textarea id="report" readonly aria-label="检测结果"></textarea>
-<p><a href="./?phase=main&v=20261122-7">返回生日页</a></p>
+<p><a href="./?phase=main&v=20261123-8">返回生日页</a></p>
 </main>
 <script>
-const lines = ["检测版本 7", location.href, navigator.userAgent];
+const lines = ["检测版本 8", location.href, navigator.userAgent];
 function log(text) {
   lines.push(text);
   document.getElementById("progress").textContent = lines.join("\n");
@@ -78,7 +78,7 @@ const cakeCheck = new Promise(resolve => {
     const downloadTimeout = setTimeout(() => controller.abort(), 25000);
     try {
       log("开始完整下载蛋糕，下载完成后再运行");
-      const response = await fetch("cake/birthday-cake-demo.html?rev=7", { signal: controller.signal });
+      const response = await fetch("cake/native-cake.html?rev=8b", { signal: controller.signal });
       if (!response.ok) throw new Error("HTTP " + response.status);
       const reader = response.body.getReader(), chunks = [];
       let bytes = 0, lastLog = 0;

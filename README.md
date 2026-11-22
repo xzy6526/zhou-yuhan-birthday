@@ -4,7 +4,7 @@
 
 ## 当前进度
 
-- 2026-11-22 用户曾确认 v6 蛋糕可显示、旋转和许愿，随后再次反馈 iPhone/Safari 照片和蛋糕卡死；v6 不视为稳定通过。v7 已发布，代码检查、Pages 部署及正式站的手机/桌面性能自动化通过，实际 iPhone/Mac 稳定性尚待复测。蛋糕保留 Three.js 模型，Mac 使用 WebGL，iPhone 保留先前已能显示模型的 Canvas 兼容路径。
+- 2026-11-23 用户在原故障 iPhone 上确认低负担原生 Three.js 独立页（v8b）「拖动明显流畅，蜡烛也能熄灭」。主页面本地已切换到相同原生 WebGL 页，等待部署和整页实机复测。v6/v7 后续都曾再次卡住，不能只据当时自动化通过宣称其真机稳定。
 - 页面分享弹窗及底部两个分享入口已移除。
 - 页面最后、页脚之前增加「想对你说」留言墙，采用叠放信笺，点封口后逐封阅读，支持回看和读完后重读。已收录 2 条亲友留言，并按用户要求补写 10 条「生日寄语」，共 12 张。亲友原话和署名保留，后续留言继续追加到本地清单并重新构建。
 
@@ -13,7 +13,7 @@
 - 主页面以紫粉色生日贺卡开场。深蓝与玫瑰粉星云贯穿封面，两层星尘缓缓漂移。刻纹月牙、旋转星盘和流星环绕着写给周昱含的祝福。封面的「去许愿」和「翻开相册」可直达互动蛋糕和回忆相册。连续点七下蛋糕印章可触发生日彩蛋。
 - 互动蛋糕使用用户提供的星空蛋糕。蛋糕项目副本保留原 3D 模型、旋转和六条星轨，支持许愿、熄灭和重新点亮蜡烛。
 - 本地相册收录 137 张照片。「校园」43 张，采用奶白边框拍立得；「聚在一起」39 张，采用电影胶片；「路上与日常」55 张，采用大小图交错的杂志拼版。蛋糕后的照片墙展示 20 张精选，照片正向排列，按列竖直流动，手机端采用较高的展示区域。2026-11-20 新增 55 张，按场景分别追加校园 22 张、聚在一起 18 张、路上与日常 15 张。
-- 蛋糕作为带内容哈希的独立脚本块在主页面加载，再通过 iframe srcdoc 显示，蛋糕数据不塞进入口脚本，也不另等 iframe HTML 下载。先显示预览，滚动到蛋糕区域后才建立 Three.js 场景。父页面按实际滚动位置通知暂停或恢复，进入后台时停止绘制。iPhone 静置停止绘制；其他浏览器缓存不变的三维模型，仅以最多约 15 帧/秒绘制星轨光效。实际尺寸未变时不重建星云和画布，渲染像素倍率统一为 1，避免 Retina 后台缓冲的额外负担。
+- 主页面通过 iframe 加载 `public/cake/native-cake.html`，取消 v7 的大 HTML 动态导入。iPhone 和 Mac 均使用原生 Three.js WebGL，移除逐三角形 CPU 光栅化和 WebGL→2D 画布回读。纹理、背景在本机构建时预生成；手机减少多层透明光晕和难以辨认的细分，保留蛋糕主体、月牙、浮雕与六条星轨。手机从 182 次绘制/182,330 个三角形降到 26 次/58,426 个三角形。连续拖动共享待执行帧，避免反复取消 rAF；静置缓存模型，光效最多约 15 帧/秒，后台和离屏停止。旧蛋糕 HTML 保留，供重建和回退。
 - 相册缩略图在距离屏幕 500 像素内才设置图片源，包含流动墙，不依赖进入视野回调或浏览器懒加载，最多 3 个缩略图同时加载。优先 WebP，失败或 12 秒未响应后尝试 JPEG，再失败时提示重载并释放队列位置。打开的大图立即加载。缩略图改为最长边 480 像素，原图保留。照片和蛋糕均提供重新加载入口，蛋糕也可单独打开。
 - 原模板部分背景音乐和音效链接返回 403，当前预览使用静音配置。提供可用的音频后，可通过 `.env.local` 中的 `VITE_BGM_URL` 配置背景音乐。
 
@@ -53,6 +53,7 @@ npm run build
 
 - 收件人、祝福和信件在 [.env](.env)。贺卡封面的月牙和星尘在 [BirthdayCover.tsx](src/components/birthday/BirthdayCover.tsx)，排版在 [BirthdayCover.css](src/components/birthday/BirthdayCover.css)。
 - 生日蛋糕在 [项目内的 HTML 副本](public/cake/birthday-cake-demo.html)，原文件保存在下载目录。
+- 正式使用的原生 Three.js 蛋糕为 `public/cake/native-cake.html`。修改旧 HTML 模型后，在本机运行 `node scripts/build-native-cake.mjs` 重新生成原生页，再执行常规构建；生成过程使用本机 Edge/Playwright 烘焙纹理，浏览手机无需执行烘焙。`node scripts/check-native-cake.mjs` 验证实际 WebGL 绘制预算、火焰移除和拖动中持续重绘。
 - 当前相册清单在 `src/config/memory-album.local.json`。可为对应照片加 `caption` 字段填写回忆，也可以调整照片顺序、精选编号及各组的 `layout`。
 - 留言墙在 `src/components/birthday/BirthdayMessageWall.tsx`。新增正式留言时创建 `src/config/messages.local.json`，按展示顺序存入 `[{"id":"note-001","text":"留言正文","author":"署名"}]`。其中 `author` 可省略，`id` 应唯一。缺少清单时展示当前生日祝福，空数组展示等待留言的文案。清单已加入 Git 忽略，文字随构建一起交付。修改后运行 `npm run build`。
 - `public/memories/` 保存浏览大图用的 WebP 和 `thumb/` 缩略图。素材、相册清单与本地编译产物都放在项目目录内，照片和清单由 Git 忽略。源照片仍在桌面。修改后执行 `npm run build`，再用启动器预览。
@@ -66,6 +67,13 @@ VITE_PHOTO_CAPTIONS="第一张的回忆|第二张的回忆"
 `npm run verify` 执行类型检查、ESLint、构建和测试。编译产物在 `dist/`。
 
 ## 验证记录
+
+- v8 排查：用户手机在无 3D、无动画的检查页测得主站脚本 HTTP 200/826,719 字节/621ms，原始蛋糕 HTML HTTP 200/816,950 字节/417ms；本次传输不慢，不能再把卡顿直接归因于 GitHub 网络。初版原生 WebGL 能显示但拖动仍卡；继续降低 GPU 绘制成本后，用户明确确认 v8b 拖动流畅、火焰可熄灭。
+- 原生构建保留源文件：`scripts/build-native-cake.mjs` 从原 HTML 生成独立原生页，避免变更 Three.js 压缩库代码，只调整场景材质、光晕与几何细分。整模型 JSON 导出试验压缩后约 956KB，比原方案更大，已放弃并移除临时试验数据；正式方案只烘焙纹理。
+- v8b 本地 Edge/WebKit 的真实绘制统计均为 26 次调用、58,426 个三角形（移动端预算）；持续 60 次、8ms 间隔的拖动输入中实际发生多次模型重绘，许愿减少了真实渲染列表中的火焰几何。`npm run verify` 27 份文件、485 项测试通过，保留 2 条原有 ESLint 警告。独立页实机结果已通过，主页面接入和 Mac 实机结果仍需另行区分。
+- 主页面接入检查：Edge/WebKit 均通过嵌入原生 WebGL、零宽恢复、许愿、三组照片及末张加载；iPhone 标识/正常动画模式验证原生 WebGL 与低于 50 次的绘制预算。WebKit 桌面正常播放完整开场，验证三轮三组大图并返回蛋糕，未发现页面运行错误。以上为 Windows 隔离浏览器自动化；完整主站实机验证仍需用户反馈。
+
+v8 修改文件：`public/cake/native-cake.html`（生成产物）、`scripts/build-native-cake.mjs`、`scripts/check-native-cake.mjs`、`src/components/birthday/MainBirthday.tsx`、`scripts/check-mobile-media.mjs`、`scripts/check-mobile-media-performance.mjs`、`public/media-check.html`、`public/delivery-check.html` 和本 README。
 
 - v7 性能回归（正常动态、6 倍 CPU 降速）：iPhone 模式静置 3 秒，蛋糕 draw 和三维模型重绘次数均为 0；无变化的 6 次 resize 不再重建背景，处理耗时约 0ms。修复前同场景测到持续 draw 调度及 6 次背景重建约 270ms。Mac 标识、1440×900 尺寸也通过模型缓存与无变化 resize 检查。脚本为 `node scripts/check-mobile-media-performance.mjs`，附加 URL 和 `mac` 可检查桌面模式。这些是 Windows 上隔离浏览器的自动化结果，不能替代真实 iPhone 或 Mac。
 - v7 将 137 张照片的 WebP/JPEG 缩略图从合计 11,068,126 字节降到 6,312,084 字节，约减少 43%；原尺寸浏览图未改。图片导入的尺寸、方向、EXIF 与失败回滚回归通过。沙箱临时目录重命名曾返回 Windows 设备错误，改在隔离的沙箱外临时目录重跑后通过。
@@ -125,7 +133,7 @@ VITE_PHOTO_CAPTIONS="第一张的回忆|第二张的回忆"
 - uiX 的 [Masonry](https://site.txbai.com/reactbits/components/masonry) 与 [Social Proof 14](https://site.txbai.com/reactbits/pro/social-proof-14) 提供错落卡片的视觉参考。根据公开元数据设计，用原生 CSS columns 和项目现有图标实现。
 - GitHub 的 [Waline](https://github.com/walinejs/waline) 与 [giscus](https://github.com/giscus/giscus) 可用于在线评论服务。当前采用用户确认的手动收集正文、补进静态页面的方式。
 
-最后更新于 2026-11-22。
+最后更新于 2026-11-23。
 
 ---
 

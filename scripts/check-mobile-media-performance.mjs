@@ -10,6 +10,13 @@ try {
     });
     page.setDefaultTimeout(15000);
     page.setDefaultNavigationTimeout(20000);
+    await page.addInitScript(() => {
+        let Scene;
+        Object.defineProperty(window, "GalaxyCakeScene", {
+            get() { return Scene; },
+            set(Type) { Scene = class extends Type { constructor(...args) { super(...args); window.testCake = this; } }; },
+        });
+    });
     const cdp = await page.context().newCDPSession(page);
     await cdp.send("Emulation.setCPUThrottlingRate", { rate: 6 });
     await page.goto(process.argv[2] || "http://127.0.0.1:4174/?phase=main", { waitUntil: "domcontentloaded" });
@@ -21,10 +28,19 @@ try {
     console.log("cake ready");
     await frame.locator("body").evaluate(() => {
         window.cakeProfile = {};
-        for (const [name, method] of [["GalaxyCakeScene", "draw"], ["DreamCakeRenderer", "render"], ["SoftwareCakeRenderer", "render"], ["DreamCakeRenderer", "makeBackground"], ["Starlight", "paint"]]) {
+        for (const [name, method] of [["GalaxyCakeScene", "draw"], ["Starlight", "paint"]]) {
             const original = window[name].prototype[method], key = name + "." + method;
             window.cakeProfile[key] = [];
             window[name].prototype[method] = function (...args) {
+                const start = performance.now();
+                try { return original.apply(this, args); }
+                finally { window.cakeProfile[key].push(performance.now() - start); }
+            };
+        }
+        for (const method of ["render", "setSize"]) {
+            const renderer = window.testCake.renderer, original = renderer[method], key = "WebGL." + method;
+            window.cakeProfile[key] = [];
+            renderer[method] = function (...args) {
                 const start = performance.now();
                 try { return original.apply(this, args); }
                 finally { window.cakeProfile[key].push(performance.now() - start); }
@@ -41,13 +57,12 @@ try {
     const resize = await frame.locator("body").evaluate(() => {
         const start = performance.now();
         for (let i = 0; i < 6; i++) window.dispatchEvent(new Event("resize"));
-        return { durationMs: Math.round(performance.now() - start), rebuilds: window.cakeProfile["DreamCakeRenderer.makeBackground"].length };
+        return { durationMs: Math.round(performance.now() - start), rebuilds: window.cakeProfile["WebGL.setSize"].length };
     });
     console.log(JSON.stringify({ idle, resize }, null, 2));
-    assert.ok(resize.rebuilds === 0, "Unchanged resize events must not rebuild the nebula and software buffers");
-    assert.ok(idle["GalaxyCakeScene.draw"].count <= (mac ? 65 : 5), "Idle rendering must stay inside the device budget");
-    assert.equal(idle["SoftwareCakeRenderer.render"].count, 0, "An untouched model must remain cached");
-    assert.equal(idle["DreamCakeRenderer.render"].count, 0, "The WebGL model and glow composition must remain cached while idle");
+    assert.ok(resize.rebuilds === 0, "Unchanged resize events must not rebuild WebGL buffers");
+    assert.ok(idle["GalaxyCakeScene.draw"].count <= 65, "Idle light effects must stay inside their budget");
+    assert.equal(idle["WebGL.render"].count, 0, "The real WebGL model must remain cached while idle");
 } finally {
     await browser.close();
 }
