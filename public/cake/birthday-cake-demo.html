@@ -21,7 +21,7 @@ p{margin:0;color:#aea1c0;font-size:11px;letter-spacing:1px}button{pointer-events
 <footer><p>拖动蛋糕，可以看见背面的花纹</p><div class="cake-actions"><button id="wish">许愿后，吹灭蜡烛</button><button id="reset">重置视角</button></div><p id="wish-note" role="status"></p></footer><div id="error"></div>
 <script>
 window.cakeReport = function(stage) {
-  window.parent.postMessage({type:'birthday-cake-status',stage:stage},'*');
+  window.parent.postMessage({type:'birthday-cake-status',stage:stage,ready:document.body.classList.contains('ready')},'*');
 };
 window.addEventListener('error',function(event){window.cakeReport('脚本错误：'+event.message+' @'+event.lineno+':'+event.colno);});
 window.addEventListener('unhandledrejection',function(event){window.cakeReport('异步错误：'+String(event.reason));});
@@ -40,6 +40,7 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
 <script>
 (function (root) {
   'use strict';
+  root.cakeReport('Three.js 脚本加载完成，版本 '+(root.THREE?.REVISION || '未加载'));
   class CakeRotation {
     constructor() { this.initialYaw = .27; this.initialPitch = .025; this.reset(); }
     reset() { this.yaw = this.initialYaw; this.pitch = this.initialPitch; this.dragging = false; this.last = null; }
@@ -135,7 +136,7 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
       const vp=new T.Matrix4().multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse);
       const inst=new T.Matrix4(),world=new T.Matrix4(),norm=new T.Matrix3(),n=new T.Vector3(),pos=new T.Vector3(),view=new T.Vector3(),half=new T.Vector3(),clip=new T.Vector4();
       const color=new T.Color(),tint=new T.Color();
-      scene.traverse(o=>{
+      scene.traverseVisible(o=>{
         if(!o.visible)return;
         if(o.isSprite){
           pos.setFromMatrixPosition(o.matrixWorld).applyMatrix4(camera.matrixWorldInverse);
@@ -580,11 +581,14 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
     constructor(host) {
       this.host=host;this.rotation=new root.CakeRotation();this.disposed=false;this.visible=true;
       root.cakeReport('开始创建渲染器，尺寸 '+host.clientWidth+'×'+host.clientHeight);
-      try { this.renderer=new T.WebGLRenderer({alpha:true,antialias:true,preserveDrawingBuffer:true}); } catch(e) { this.renderer=new root.SoftwareCakeRenderer(); }
+      const ios=/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+      if(ios) this.renderer=new root.SoftwareCakeRenderer();
+      else try { this.renderer=new T.WebGLRenderer({alpha:true,antialias:true,preserveDrawingBuffer:true}); } catch(e) { this.renderer=new root.SoftwareCakeRenderer(); }
       root.cakeReport(this.renderer.software?'使用软件渲染器':'WebGL 渲染器已创建');
       this.renderer.setPixelRatio(Math.min(devicePixelRatio,2));this.renderer.outputColorSpace=T.SRGBColorSpace;
       this.renderer.toneMapping=T.ACESFilmicToneMapping;this.renderer.toneMappingExposure=1.08;
       this.renderer=new root.DreamCakeRenderer(this.renderer);
+      if(ios)this.renderer.setPixelRatio(1);
       this.renderer.setClearColor(0x000000,0);
       this.canvas=this.renderer.domElement;this.canvas.id='cake-canvas';this.canvas.tabIndex=0;
       this.canvas.setAttribute('role','img');this.canvas.setAttribute('aria-label','可交互的三维星空蛋糕，移动鼠标或按住拖动旋转，方向键也可转动');
@@ -813,7 +817,7 @@ try {
 }
 catch(e){window.cakeReport('启动失败：'+String(e)+' '+(e.stack||''));const el=document.getElementById('error');el.style.display='block';el.textContent='蛋糕交互暂未启动，可以先欣赏静态蛋糕。';console.error(e);}
 }
-bootCake();
+setTimeout(bootCake,0);
 </script><!-- Three.js MIT license
 The MIT License
 
