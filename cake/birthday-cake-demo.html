@@ -570,7 +570,7 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
 
   class GalaxyCakeScene {
     constructor(host) {
-      this.host=host;this.rotation=new root.CakeRotation();this.disposed=false;
+      this.host=host;this.rotation=new root.CakeRotation();this.disposed=false;this.visible=true;
       try { this.renderer=new T.WebGLRenderer({alpha:true,antialias:true,preserveDrawingBuffer:true}); } catch(e) { this.renderer=new root.SoftwareCakeRenderer(); }
       this.renderer.setPixelRatio(Math.min(devicePixelRatio,2));this.renderer.outputColorSpace=T.SRGBColorSpace;
       this.renderer.toneMapping=T.ACESFilmicToneMapping;this.renderer.toneMappingExposure=1.08;
@@ -589,11 +589,11 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
       this.motion=matchMedia('(prefers-reduced-motion: reduce)');this.lastPaint=-Infinity;
       this.onResize=()=>this.resize();window.addEventListener('resize',this.onResize);this.resize();
       this.canvas.dataset.meshes=String(this.rig.children.length);this.start=performance.now();
-      this.observer=new IntersectionObserver(([entry])=>{
-        this.visible=entry.isIntersecting;
-        this.updateLoop();
+      cancelAnimationFrame(this.raf);this.raf=null;this.draw();
+      window.addEventListener('message',event=>{
+        if(event.source!==window.parent || event.data?.type!=='birthday-cake-visibility')return;
+        this.visible=event.data.visible===true;this.updateLoop();
       });
-      this.observer.observe(host);
       document.addEventListener('visibilitychange',()=>this.updateLoop());
       this.motion.addEventListener('change',()=>this.updateLoop());
     }
@@ -735,7 +735,7 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
     }
     resetView() { this.rotation.reset();this.syncPose(); }
     resize() {
-      this.dirty=true;const w=this.host.clientWidth,h=this.host.clientHeight,aspect=w/h;
+      this.dirty=true;const w=Math.max(1,this.host.clientWidth),h=Math.max(1,this.host.clientHeight),aspect=w/h;
       this.renderer.setSize(w,h);this.effectCanvas.width=this.canvas.width;this.effectCanvas.height=this.canvas.height;this.camera.aspect=aspect;
       const distance=Math.max(8.7,3.05/(Math.tan(this.camera.fov*Math.PI/360)*aspect))*1.40;
       this.camera.position.set(0,1.5+distance*.025,distance);this.camera.lookAt(0,.45,0);this.camera.updateProjectionMatrix();
@@ -746,6 +746,7 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
       if(!this.visible || document.hidden){
         cancelAnimationFrame(this.raf);
         this.raf=null;
+        if(this.dirty && !document.hidden && this.start!==undefined)this.draw();
       } else if(this.raf==null){
         this.raf=requestAnimationFrame(()=>this.draw());
       }
@@ -778,8 +779,11 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
 
 </script>
 <script>
+function bootCake() {
+  const host = document.getElementById('scene');
+  if(!host.clientWidth || !host.clientHeight){requestAnimationFrame(bootCake);return;}
 try {
-  const cake = new GalaxyCakeScene(document.getElementById('scene'));
+  const cake = new GalaxyCakeScene(host);
   document.getElementById('reset').addEventListener('click', () => cake.resetView());
   const wishButton = document.getElementById('wish');
   const wishNote = document.getElementById('wish-note');
@@ -794,6 +798,8 @@ try {
   document.body.classList.add('ready');
 }
 catch(e){const el=document.getElementById('error');el.style.display='block';el.textContent='3D 交互未能启动，已保留静态预览。请换一个支持 3D 的浏览器打开。';console.error(e);}
+}
+bootCake();
 </script><!-- Three.js MIT license
 The MIT License
 
