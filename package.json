@@ -87,7 +87,7 @@
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.68.0",
     "vite": "^8.2.2",
-    "vitest": "^3.2.4"
+    "vitest": "^5.1.1"
   },
   "overrides": {
     "brace-expansion": "^2.1.4",
