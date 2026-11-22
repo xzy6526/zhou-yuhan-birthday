@@ -1,0 +1,25 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>生日页加载检查</title>
+<style>body{margin:0;padding:22px;background:#171125;color:#f6e9ef;font:16px/1.7 system-ui}main{max-width:640px;margin:auto}pre,textarea{box-sizing:border-box;width:100%;white-space:pre-wrap;overflow-wrap:anywhere;background:#241b30;color:inherit;border:1px solid #705575;padding:14px;border-radius:12px;font:12px/1.6 monospace}textarea{height:280px}button{padding:12px 18px;border:1px solid #cda3bd;background:#563a58;color:inherit;border-radius:12px;font:inherit}</style>
+<main><h1>生日页加载检查</h1><p>这里不运行蛋糕，也不播放动画。约需 30 秒，结束后请复制结果。</p><pre id="status">开始检查…</pre><button id="copy">复制结果</button><textarea id="report" readonly aria-label="检查结果"></textarea></main>
+<script>
+const lines=['加载检查 8',navigator.userAgent];
+function log(text){lines.push(text);document.getElementById('status').textContent=lines.join('\n');document.getElementById('report').value=lines.join('\n');}
+async function check(label,url){
+ const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),10000),start=performance.now();
+ try{
+  log(label+'：开始下载');
+  const response=await fetch(url,{signal:controller.signal,cache:'no-store'});
+  const data=await response.arrayBuffer();
+  log(label+'：HTTP '+response.status+'，'+data.byteLength+' 字节，'+Math.round(performance.now()-start)+'ms');
+ }catch(error){log(label+'：'+error.name+' '+error.message+'，'+Math.round(performance.now()-start)+'ms');}
+ finally{clearTimeout(timer);}
+}
+(async()=>{
+ await check('主站蛋糕脚本','birthday-cake-demo.vYx7rffx.js');
+ await check('主站蛋糕文件','cake/birthday-cake-demo.html?rev=8');
+ await check('备用线路蛋糕','https://cdn.jsdelivr.net/gh/xzy6526/zhou-yuhan-birthday@c4a06c02fbdb2f26ae4e7ccf2f4fbf2bad7ca189/cake/birthday-cake-demo.html');
+ await check('主站照片','memories/thumb/23.webp?v=8');
+ log('检查完成');
+})();
+document.getElementById('copy').onclick=async()=>{const report=document.getElementById('report');try{await navigator.clipboard.writeText(report.value);document.getElementById('copy').textContent='已复制';}catch(_){report.focus();report.select();document.execCommand('copy');}};
+</script></html>
