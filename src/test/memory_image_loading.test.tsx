@@ -7,7 +7,7 @@ afterEach(() => {
     vi.unstubAllGlobals();
 });
 
-it("loads images when visibility observers stay silent, falls back after failure and resets on retry", () => {
+it("assigns sources without observer callbacks, defers thumbnails and eagerly opens the full photo", () => {
     vi.stubGlobal("IntersectionObserver", class {
         observe() {}
         disconnect() {}
@@ -18,15 +18,18 @@ it("loads images when visibility observers stay silent, falls back after failure
     };
     const { container } = render(<BirthdayMemoryAlbum album={album} />);
     const photo = container.querySelector(".memory-album__grid img") as HTMLImageElement;
-    expect(photo).toHaveAttribute("loading", "eager");
-    expect(photo.src).toMatch(/01\.jpg$/);
-    fireEvent.error(photo);
+    expect(photo).toHaveAttribute("loading", "lazy");
     expect(photo.src).toMatch(/01\.webp$/);
+    fireEvent.error(photo);
+    expect(photo.src).toMatch(/01\.jpg$/);
     fireEvent.error(photo);
     expect(photo.alt).toContain("重新加载照片");
     fireEvent.click(screen.getByRole("button", { name: "重新加载照片" }));
     const retry = container.querySelector(".memory-album__grid img") as HTMLImageElement;
     expect(retry).not.toBe(photo);
-    expect(retry.src).toMatch(/01\.jpg$/);
+    expect(retry.src).toMatch(/01\.webp$/);
     expect(retry.dataset.fallback).toBeUndefined();
+    Object.assign(container.querySelector("dialog")!, { showModal: vi.fn() });
+    fireEvent.click(screen.getByRole("button", { name: "查看校园第1张照片" }));
+    expect(container.querySelector(".memory-viewer__photo")).toHaveAttribute("loading", "eager");
 });

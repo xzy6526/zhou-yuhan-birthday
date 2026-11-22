@@ -8,15 +8,16 @@ body{margin:0;padding:24px;background:#171125;color:#f6e9ef;font:16px/1.7 system
 </style>
 <main>
 <h1>生日页图片检测</h1>
-<p>这页会直接加载两张测试图和蛋糕文件，约需 20 秒。完成后，把下面的检测结果复制给我。</p>
+<p>这页单独运行蛋糕并记录启动步骤。请保持页面打开，显示「检测完成」后复制结果。</p>
+<iframe id="cake" title="蛋糕启动检测" sandbox="allow-scripts" style="display:block;width:100%;height:450px;border:1px solid #80618b;border-radius:14px"></iframe>
 <div id="samples"></div>
 <pre id="progress">正在检测…</pre>
 <button id="copy" type="button">复制检测结果</button>
 <textarea id="report" readonly aria-label="检测结果"></textarea>
-<p><a href="./?v=20261122-2">返回生日页</a></p>
+<p><a href="./?phase=main&v=20261122-5">返回生日页</a></p>
 </main>
 <script>
-const lines = ["检测版本 3", location.href, navigator.userAgent];
+const lines = ["检测版本 5", location.href, navigator.userAgent];
 function log(text) {
   lines.push(text);
   document.getElementById("progress").textContent = lines.join("\n");
@@ -50,10 +51,31 @@ async function check(path, image) {
   } catch (error) { log(path + " → " + error.name + " " + error.message); }
   finally { clearTimeout(timer); }
 }
+const frame = document.getElementById("cake");
+const startCake = performance.now();
+let cakeFinished = false;
+const cakeCheck = new Promise(resolve => {
+  const timeout = setTimeout(() => {
+    if (!cakeFinished) log("蛋糕运行 30 秒仍未报告完成，请保留上方最后一个步骤");
+    resolve();
+  }, 30000);
+  window.addEventListener("message", event => {
+    if (event.source !== frame.contentWindow || event.data?.type !== "birthday-cake-status") return;
+    const stage = String(event.data.stage);
+    log("蛋糕 " + Math.round(performance.now() - startCake) + "ms → " + stage);
+    if (/首次绘制完成|启动失败/.test(stage)) {
+      cakeFinished = true;
+      clearTimeout(timeout);
+      resolve();
+    }
+  });
+  frame.onload = () => log("蛋糕 iframe 文档已载入");
+  frame.src = "cake/birthday-cake-demo.html?rev=5";
+});
 Promise.all([
   check("memories/thumb/23.jpg", true),
   check("memories/thumb/23.webp", true),
-  check("cake/birthday-cake-demo.html", false),
+  cakeCheck,
 ]).then(() => log("检测完成"));
 document.getElementById("copy").onclick = async () => {
   const report = document.getElementById("report");

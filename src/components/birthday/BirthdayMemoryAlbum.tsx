@@ -5,16 +5,16 @@ import type { MemoryAlbumData } from "@/config/localMemoryAlbum";
 import "./BirthdayMemoryAlbum.css";
 
 const asset = (id: string, thumbnail = false) =>
-    `${import.meta.env.BASE_URL}memories/${thumbnail ? "thumb/" : ""}${id}.jpg`;
+    `${import.meta.env.BASE_URL}memories/${thumbnail ? "thumb/" : ""}${id}.webp`;
 
 const MemoryImage = ({ id, thumbnail = false, ...props }: ImgHTMLAttributes<HTMLImageElement> & { id: string; thumbnail?: boolean }) => {
     return (
-        <img {...props} src={asset(id, thumbnail)} loading="eager" decoding="async"
+        <img {...props} src={asset(id, thumbnail)} loading={thumbnail ? "lazy" : "eager"} decoding="async"
             onError={event => {
                 const img = event.currentTarget;
                 if (!img.dataset.fallback) {
                     img.dataset.fallback = "true";
-                    img.src = asset(id, thumbnail).replace(/\.jpg$/, ".webp");
+                    img.src = asset(id, thumbnail).replace(/\.webp$/, ".jpg");
                 } else {
                     img.alt = "照片加载失败，请点重新加载照片";
                 }
