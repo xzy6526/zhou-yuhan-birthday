@@ -14,10 +14,10 @@ body{margin:0;padding:24px;background:#171125;color:#f6e9ef;font:16px/1.7 system
 <pre id="progress">正在检测…</pre>
 <button id="copy" type="button">复制检测结果</button>
 <textarea id="report" readonly aria-label="检测结果"></textarea>
-<p><a href="./?phase=main&v=20261122-5">返回生日页</a></p>
+<p><a href="./?phase=main&v=20261122-6">返回生日页</a></p>
 </main>
 <script>
-const lines = ["检测版本 5", location.href, navigator.userAgent];
+const lines = ["检测版本 6", location.href, navigator.userAgent];
 function log(text) {
   lines.push(text);
   document.getElementById("progress").textContent = lines.join("\n");
@@ -70,7 +70,28 @@ const cakeCheck = new Promise(resolve => {
     }
   });
   frame.onload = () => log("蛋糕 iframe 文档已载入");
-  frame.src = "cake/birthday-cake-demo.html?rev=5";
+  (async () => {
+    const controller = new AbortController();
+    const downloadTimeout = setTimeout(() => controller.abort(), 25000);
+    try {
+      log("开始完整下载蛋糕，下载完成后再运行");
+      const response = await fetch("cake/birthday-cake-demo.html?rev=6", { signal: controller.signal });
+      if (!response.ok) throw new Error("HTTP " + response.status);
+      const reader = response.body.getReader(), chunks = [];
+      let bytes = 0, lastLog = 0;
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        chunks.push(value); bytes += value.length;
+        if (bytes - lastLog >= 200000) { log("蛋糕已下载 " + bytes + " 字节"); lastLog = bytes; }
+      }
+      log("蛋糕下载完成：" + bytes + " 字节，" + Math.round(performance.now() - startCake) + "ms；开始运行");
+      frame.srcdoc = await new Blob(chunks).text();
+    } catch (error) {
+      log("蛋糕下载失败：" + String(error));
+      clearTimeout(timeout); resolve();
+    } finally { clearTimeout(downloadTimeout); }
+  })();
 });
 Promise.all([
   check("memories/thumb/23.jpg", true),
