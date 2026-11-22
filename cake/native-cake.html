@@ -203,10 +203,10 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
   }
   function cord(at,segments,radius){
     const path=Array.from({length:segments+1},(_,i)=>at(i/segments));
-    return new T.TubeGeometry(new T.CatmullRomCurve3(path),segments,radius,8,false);
+    const mobile=matchMedia('(pointer:coarse)').matches;return new T.TubeGeometry(new T.CatmullRomCurve3(path),mobile?Math.min(segments,96):segments,radius,mobile?6:8,false);
   }
   function bead(pos,size){
-    return new T.SphereGeometry(size,10,8).translate(pos.x,pos.y,pos.z);
+    return new T.SphereGeometry(size,8,6).translate(pos.x,pos.y,pos.z);
   }
   function emblem(moon){
     const s=new T.Shape();
@@ -225,7 +225,7 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
   }
   // A six-groove piping nozzle traveling in a tapered spiral.
   function rosette() {
-    const p=[],idx=[],steps=64,sides=18;
+    const mobile=matchMedia('(pointer:coarse)').matches;const p=[],idx=[],steps=mobile?28:48,sides=mobile?12:16;
     function point(t){
       const a=tau*1.35*t,r=.093*(1-t)**.8;
       return new T.Vector3(r*Math.cos(a),.043+t*.086,r*Math.sin(a));
@@ -369,9 +369,9 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
       const fill=new T.DirectionalLight(0xe6b5e7,.7);fill.position.set(-4,0,1);this.scene.add(fill);
     }
     makeCake() {
-      const bodyMat=new T.MeshPhysicalMaterial({map:galaxyTexture(),roughness:.61,metalness:.035,clearcoat:.19,clearcoatRoughness:.44,emissive:0x28234c,emissiveIntensity:.35});
-      const body=new T.Mesh(new T.CylinderGeometry(1.54,1.56,2.38,144,8),bodyMat);body.name='solid-cake-cylinder';this.rig.add(body);
-      const topMat=new T.MeshPhysicalMaterial({map:creamTexture(),roughness:.38,metalness:.1,emissive:0x38314d,emissiveIntensity:.18});
+      const bodyMat=new T.MeshStandardMaterial({map:galaxyTexture(),roughness:.61,metalness:.035,emissive:0x28234c,emissiveIntensity:.35});
+      const body=new T.Mesh(new T.CylinderGeometry(1.54,1.56,2.38,144,1),bodyMat);body.name='solid-cake-cylinder';this.rig.add(body);
+      const topMat=new T.MeshStandardMaterial({map:creamTexture(),roughness:.38,metalness:.1,emissive:0x38314d,emissiveIntensity:.18});
       const top=new T.Mesh(new T.CylinderGeometry(1.56,1.54,.10,144),topMat);top.position.y=1.22;this.rig.add(top);
       const positions=[],cols=[],indices=[];const creamColors=[0xf8e7d8,0xe6d4de,0xc7bedf,0xdac7e1,0xb2bedc];
       for(let i=0;i<=192;i++){
@@ -385,7 +385,7 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
       const dripGeo=new T.BufferGeometry();dripGeo.setAttribute('position',new T.Float32BufferAttribute(positions,3));dripGeo.setAttribute('color',new T.Float32BufferAttribute(cols,3));dripGeo.setIndex(indices);dripGeo.computeVertexNormals();
       this.rig.add(new T.Mesh(dripGeo,new T.MeshStandardMaterial({vertexColors:true,roughness:.48,metalness:.1,side:T.DoubleSide})));
       const profile=[new T.Vector2(0,-1.43),new T.Vector2(1.8,-1.43),new T.Vector2(2.10,-1.38),new T.Vector2(2.23,-1.28),new T.Vector2(2.19,-1.23),new T.Vector2(2.08,-1.25),new T.Vector2(1.7,-1.31),new T.Vector2(0,-1.31)];
-      const plate=new T.Mesh(new T.LatheGeometry(profile,144),new T.MeshPhysicalMaterial({color:0x727399,metalness:.55,roughness:.32,clearcoat:.5,side:T.DoubleSide}));plate.name='solid-silver-plate';this.rig.add(plate);
+      const plate=new T.Mesh(new T.LatheGeometry(profile,144),new T.MeshStandardMaterial({color:0x727399,metalness:.55,roughness:.32,side:T.DoubleSide}));plate.name='solid-silver-plate';this.rig.add(plate);
       const trim=new T.Mesh(new T.TorusGeometry(2.19,.018,8,160),new T.MeshBasicMaterial({color:0xffcd7e}));trim.rotation.x=Math.PI/2;trim.position.y=-1.3;this.rig.add(trim);
       // A narrow foot and its contact shadow connect the cake to its reflective plate.
       const foot=new T.Mesh(new T.CylinderGeometry(1.53,1.50,.13,96),new T.MeshStandardMaterial({color:0x363145,roughness:.64}));
@@ -415,7 +415,7 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
     makeCandle() {
       const candleCanvas=canvas(128,256),g=candleCanvas.getContext('2d');g.fillStyle='#bb96d9';g.fillRect(0,0,128,256);
       g.strokeStyle='#e9d9f5';g.lineWidth=12;for(let i=-4;i<9;i++){g.beginPath();g.moveTo(0,i*44);g.lineTo(128,i*44+65);g.stroke();}
-      const candle=new T.Mesh(new T.CylinderGeometry(.066,.061,1.01,32),new T.MeshPhysicalMaterial({map:texture(candleCanvas),roughness:.38,clearcoat:.4}));candle.position.y=1.77;this.rig.add(candle);
+      const candle=new T.Mesh(new T.CylinderGeometry(.066,.061,1.01,32),new T.MeshStandardMaterial({map:texture(candleCanvas),roughness:.38}));candle.position.y=1.77;this.rig.add(candle);
       const wick=new T.Mesh(new T.CylinderGeometry(.009,.012,.12,8),new T.MeshBasicMaterial({color:0x322632}));wick.position.y=2.31;this.rig.add(wick);
       const profile=[new T.Vector2(0,0),new T.Vector2(.07,.04),new T.Vector2(.115,.17),new T.Vector2(.08,.34),new T.Vector2(.029,.49),new T.Vector2(0,.65)];
       this.flame=new T.Group();this.flame.position.y=2.34;this.flame.name='three-dimensional-flame';
@@ -428,9 +428,9 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
       const parent=new T.Group();parent.position.y=y;parent.rotation.set(rx,0,rz);const points=[];
       for(let i=0;i<180;i++){const a=i/180*TAU;points.push(new T.Vector3(Math.cos(a)*radius,Math.sin(a*3+phase)*.012,Math.sin(a)*radius*.86));}
       const curve=new T.CatmullRomCurve3(points,true);
-      for(let pass=0;pass<3;pass++){
+      for(let pass=0;pass<1;pass++){
         const width=[.007,.030,.065][pass]*(accent?.width??1);
-        const geo=new T.TubeGeometry(curve,220,width,6,true);
+        const geo=new T.TubeGeometry(curve,96,width,4,true);
         const colors=[];const pos=geo.getAttribute('position');const c1=new T.Color(color),c2=new T.Color(0xb0b5ff),c3=new T.Color(0xffeac5);
         for(let i=0;i<pos.count;i++){const a=Math.atan2(pos.getZ(i),pos.getX(i)),c=c1.clone().lerp(c2,.4+.4*Math.sin(a*2+phase)).lerp(c3,Math.max(0,Math.sin(a*5))*.65);colors.push(c.r,c.g,c.b);}
         geo.setAttribute('color',new T.Float32BufferAttribute(colors,3));
@@ -449,7 +449,7 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
       this.orbit(2.73,-1.49,.11,-.09,0xffc2e0,1.1,{width:.78,intensity:.59,speed:-2,start:.57,tint:'rose'});
     }
     makeParticles() {
-      const d=new T.Object3D();const balls=new T.InstancedMesh(new T.SphereGeometry(1,8,6),new T.MeshBasicMaterial({color:0xffffff,toneMapped:false}),620);
+      const d=new T.Object3D();const balls=new T.InstancedMesh(new T.OctahedronGeometry(1,0),new T.MeshBasicMaterial({color:0xffffff,toneMapped:false}),620);
       for(let i=0;i<620;i++){
         let x,y,z;
         if(i<390){const a=random()*TAU,r=range(.55,2.65);x=Math.cos(a)*r;y=2.15+(random()+random()-1)*1.7;z=Math.sin(a)*r*.7;}
@@ -462,20 +462,6 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
         const a=random()*TAU,r=range(1.9,2.7);d.position.set(Math.cos(a)*r,range(-1.2,3.9),Math.sin(a)*r);d.rotation.set(range(-.7,.7),random()*TAU,random()*TAU);d.scale.setScalar(range(.022,.065));d.updateMatrix();floating.setMatrixAt(i,d.matrix);floating.setColorAt(i,new T.Color(pick(PALETTE)));
       }
       floating.instanceMatrix.needsUpdate=true;floating.instanceColor.needsUpdate=true;this.rig.add(floating);
-      for(let i=0;i<22;i++){
-        const s=new T.Sprite(new T.SpriteMaterial({map:this.glowMap,color:pick([0xb18acb,0xcd9dd9,0xad7fac,0xe2a9c6]),transparent:true,opacity:range(.1,.24),depthWrite:false,blending:T.AdditiveBlending,toneMapped:false}));
-        const a=random()*TAU,r=range(1.8,2.6);s.position.set(Math.cos(a)*r,range(-1.5,3.5),Math.sin(a)*r);const size=range(1.2,2.4);s.scale.set(size,size,1);this.rig.add(s);
-      }
-      // Small luminous cores surrounded by soft halos, positioned in real 3D.
-      for(let i=0;i<38;i++){
-        const a=random()*TAU,r=range(1.8,2.8),s=new T.Sprite(new T.SpriteMaterial({map:this.glowMap,color:pick(PALETTE),transparent:true,opacity:range(.4,.75),depthWrite:false,blending:T.AdditiveBlending,toneMapped:false}));
-        s.position.set(Math.cos(a)*r,range(-1.4,3.9),Math.sin(a)*r);const size=range(.14,.32);s.scale.set(size,size,1);this.rig.add(s);
-      }
-      const softMap=softLightTexture();
-      for(let i=0;i<84;i++){
-        const s=new T.Sprite(new T.SpriteMaterial({map:softMap,color:pick([0xe5b6f6,0xf0badc,0xffb7ce,0xc6a3ef]),transparent:true,opacity:range(.22,.48),depthWrite:false,blending:T.AdditiveBlending,toneMapped:false}));
-        const a=random()*TAU,r=range(1.1,3.9);s.position.set(Math.cos(a)*r,range(-1.5,4.0),range(-3.5,-1.0));const size=range(.27,.75);s.scale.set(size,size,1);s.userData.defocused=true;s.name='soft-rear-light';this.rig.add(s);
-      }
     }
     bindPointer() {
       const c=this.canvas,s=this.rotation;
@@ -510,10 +496,13 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
     }
     snapshot() { this.renderer.render(this.scene,this.camera);return this.canvas.toDataURL('image/png'); }
     updateLoop() {
-      cancelAnimationFrame(this.raf);clearTimeout(this.timer);this.raf=null;
-      if(document.hidden || (!this.dirty && (!this.visible || this.renderer.software || this.motion?.matches)))return;
-      const schedule=()=>{this.raf=requestAnimationFrame(()=>this.draw());};
-      if(this.dirty)schedule();else this.timer=setTimeout(schedule,1000/15);
+      if(document.hidden || !this.visible){cancelAnimationFrame(this.raf);clearTimeout(this.timer);this.raf=null;this.timer=null;return;}
+      if(this.dirty){
+        clearTimeout(this.timer);this.timer=null;
+        if(this.raf==null)this.raf=requestAnimationFrame(()=>this.draw());
+      }else if(!this.motion?.matches && this.raf==null && this.timer==null){
+        this.timer=setTimeout(()=>{this.timer=null;this.raf=requestAnimationFrame(()=>this.draw());},1000/15);
+      }
     }
     draw() {
       this.raf=null;
@@ -528,7 +517,7 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
           this.flame.scale.set(1/flicker,flicker,1/flicker);
           this.flame.rotation.z=.032*Math.sin(t*3.2)+.024*Math.sin(t*5.8);
           this.flameGlow.material.opacity=.58+(flicker-1)*1.1;
-          this.candleLight.intensity=5.1+(flicker-1)*10;
+          this.candleLight.intensity=this.flame.visible?5.1+(flicker-1)*10:0;
           this.renderer.render(this.scene,this.camera);this.lastBase=now;
         }
         const c=this.effectContext,w=this.effectCanvas.width,h=this.effectCanvas.height;
@@ -554,7 +543,7 @@ try {
   const wishNote = document.getElementById('wish-note');
   wishButton.addEventListener('click', () => {
     const lit = !cake.flame.visible;
-    cake.flame.traverse(object=>{object.visible=lit;});cake.flameGlow.visible=cake.candleLight.visible=lit;
+    cake.flame.traverse(object=>{object.visible=lit;});cake.flameGlow.visible=lit;cake.candleLight.visible=true;cake.candleLight.intensity=lit?5.1:0;
     cake.dirty = true;
     cake.draw();
     wishButton.textContent = lit ? '许愿后，吹灭蜡烛' : '再点亮蜡烛';
