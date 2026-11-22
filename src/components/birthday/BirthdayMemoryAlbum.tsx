@@ -5,7 +5,7 @@ import type { MemoryAlbumData } from "@/config/localMemoryAlbum";
 import "./BirthdayMemoryAlbum.css";
 
 const asset = (id: string, thumbnail = false) =>
-    `${import.meta.env.BASE_URL}memories/${thumbnail ? "thumb/" : ""}${id}.webp`;
+    `${import.meta.env.BASE_URL}memories/${thumbnail ? "thumb/" : ""}${id}.webp${thumbnail ? "?v=7" : ""}`;
 
 const MemoryImage = ({ id, thumbnail = false, deferred = false, ...props }: ImgHTMLAttributes<HTMLImageElement> & { id: string; thumbnail?: boolean; deferred?: boolean }) => {
     return (
@@ -14,8 +14,9 @@ const MemoryImage = ({ id, thumbnail = false, deferred = false, ...props }: ImgH
                 const img = event.currentTarget;
                 if (!img.dataset.fallback) {
                     img.dataset.fallback = "true";
-                    img.src = asset(id, thumbnail).replace(/\.webp$/, ".jpg");
+                    img.src = asset(id, thumbnail).replace(".webp", ".jpg");
                 } else {
+                    img.removeAttribute("src");
                     img.alt = "照片加载失败，请点重新加载照片";
                 }
             }}
@@ -49,7 +50,7 @@ const MemoryWall = ({ featured }: { featured: string[] }) => {
                             {[0, 1].map(copy => (
                                 <div className="memory-wall__tiles" key={copy}>
                                     {lane.map(id => (
-                                        <MemoryImage key={id} id={id} thumbnail alt="" />
+                                        <MemoryImage key={id} id={id} thumbnail deferred alt="" />
                                     ))}
                                 </div>
                             ))}
@@ -115,26 +116,52 @@ const BirthdayMemoryAlbum = ({ album }: { album: MemoryAlbumData }) => {
     const [retry, setRetry] = useState(0);
     useEffect(() => {
         let scheduled = 0;
+        const albumElement = albumRef.current;
+        const timeouts = new Map<HTMLImageElement, number>();
+        const watch = (image: HTMLImageElement) => {
+            timeouts.set(image, window.setTimeout(() => image.dispatchEvent(new Event("error")), 12000));
+        };
         const loadNearby = () => {
             scheduled = 0;
-            const pending = albumRef.current?.querySelectorAll<HTMLImageElement>("img[data-memory-src]");
-            const nearby = Array.from(pending || []).filter(image => {
+            if (!albumElement) return;
+            const available = 3 - albumElement.querySelectorAll("img[data-memory-loading]").length;
+            if (available <= 0) return;
+            const pending = albumElement.querySelectorAll<HTMLImageElement>("img[data-memory-src]");
+            const nearby = Array.from(pending).map(image => {
                 const rect = image.getBoundingClientRect();
-                return rect.width > 0 && rect.top < window.innerHeight + 500 && rect.bottom > -500;
-            });
-            nearby.forEach(image => {
+                const region = image.closest(".memory-wall")?.getBoundingClientRect() || rect;
+                return { image, rect, region };
+            }).filter(({ rect, region }) => rect.width > 0 && region.top < window.innerHeight + 500 && region.bottom > -500)
+                .sort((a, b) => Math.abs(a.rect.top - window.innerHeight / 2) - Math.abs(b.rect.top - window.innerHeight / 2));
+            nearby.slice(0, available).forEach(({ image }) => {
+                image.dataset.memoryLoading = "true";
                 image.src = image.dataset.memorySrc!;
                 image.removeAttribute("data-memory-src");
+                watch(image);
             });
         };
         const schedule = () => {
             if (!scheduled) scheduled = window.requestAnimationFrame(loadNearby);
         };
+        const settled = (event: Event) => {
+            const image = event.target;
+            if (!(image instanceof HTMLImageElement) || !image.dataset.memoryLoading) return;
+            window.clearTimeout(timeouts.get(image));
+            timeouts.delete(image);
+            if (event.type === "error" && !image.dataset.fallback) watch(image);
+            else delete image.dataset.memoryLoading;
+            schedule();
+        };
+        albumElement?.addEventListener("load", settled, true);
+        albumElement?.addEventListener("error", settled, true);
         schedule();
         window.addEventListener("scroll", schedule, { passive: true });
         window.addEventListener("resize", schedule);
         return () => {
             window.cancelAnimationFrame(scheduled);
+            timeouts.forEach(timeout => window.clearTimeout(timeout));
+            albumElement?.removeEventListener("load", settled, true);
+            albumElement?.removeEventListener("error", settled, true);
             window.removeEventListener("scroll", schedule);
             window.removeEventListener("resize", schedule);
         };

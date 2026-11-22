@@ -31,6 +31,16 @@ export const MainBirthday = () => {
     const [visible, setVisible] = useState(false);
     const cakeRef = useRef<HTMLIFrameElement>(null);
     const [cakeRetry, setCakeRetry] = useState(0);
+    const [cakeDocument, setCakeDocument] = useState('<!doctype html><html lang="zh-CN"><meta charset="utf-8"><body style="background:#080713;color:#e7d5e6;font:16px system-ui;text-align:center;padding:80px 20px">正在准备星空蛋糕…</body></html>');
+    useEffect(() => {
+        let active = true;
+        import("../../../public/cake/birthday-cake-demo.html?raw").then(module => {
+            if (active) setCakeDocument(module.default);
+        }).catch(() => {
+            if (active) setCakeDocument('<!doctype html><html lang="zh-CN"><meta charset="utf-8"><body style="background:#080713;color:#e7d5e6;font:16px system-ui;text-align:center;padding:80px 20px">蛋糕还没加载完成，请点下方「重新加载蛋糕」。</body></html>');
+        });
+        return () => { active = false; };
+    }, [cakeRetry]);
     const updateCakeVisibility = useCallback(() => {
         const frame = cakeRef.current;
         if (!frame) return;
@@ -270,7 +280,7 @@ export const MainBirthday = () => {
                 ref={cakeRef}
                 onLoad={updateCakeVisibility}
                 key={cakeRetry}
-                src={import.meta.env.BASE_URL + "cake/birthday-cake-demo.html?rev=6&retry=" + cakeRetry}
+                srcDoc={cakeDocument}
                 title="周昱含的互动生日蛋糕"
                 loading="eager"
                 sandbox="allow-scripts"
@@ -280,7 +290,7 @@ export const MainBirthday = () => {
           ) : <CakeCutting />}
           {name === "周昱含" && <div className="mt-3 flex justify-center gap-5 text-xs text-white/70">
             <button type="button" className="min-h-10 underline underline-offset-4" onClick={() => setCakeRetry(value => value + 1)}>重新加载蛋糕</button>
-            <a className="inline-flex min-h-10 items-center underline underline-offset-4" href={import.meta.env.BASE_URL + "cake/birthday-cake-demo.html?rev=6"} target="_blank" rel="noreferrer">单独打开蛋糕</a>
+            <a className="inline-flex min-h-10 items-center underline underline-offset-4" href={import.meta.env.BASE_URL + "cake/birthday-cake-demo.html?rev=7"} target="_blank" rel="noreferrer">单独打开蛋糕</a>
           </div>}
         </div>
       </section>)}

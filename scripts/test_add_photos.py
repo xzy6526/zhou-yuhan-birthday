@@ -34,7 +34,7 @@ class PhotoImportTest(unittest.TestCase):
             self.assertEqual(add_photos(root, [src], "校园"), (0, 1))
             photo, = json.loads(manifest.read_text(encoding="utf-8"))["groups"][0]["photos"]
             filename = photo["id"] + ".webp"
-            for path, size in [(media / filename, (960, 1920)), (media / "thumb" / filename, (320, 640))]:
+            for path, size in [(media / filename, (960, 1920)), (media / "thumb" / filename, (240, 480))]:
                 for variant in (path, path.with_suffix(".jpg")):
                     with Image.open(variant) as image:
                         self.assertEqual(image.size, size)

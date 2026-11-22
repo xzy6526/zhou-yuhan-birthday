@@ -66,9 +66,9 @@ def add_photos(root, sources, group_title):
                     image.save(stage / filename, quality=86)
                     image.convert("RGB").save(stage / (photo_id + ".jpg"), quality=87, optimize=True)
                     groups[group_title]["photos"].append(dict(id=photo_id, width=image.width, height=image.height, sourceSha256=digest))
-                    image.thumbnail((640, 640), Image.Resampling.LANCZOS)
-                    image.save(stage / "thumb" / filename, quality=80)
-                    image.convert("RGB").save(stage / "thumb" / (photo_id + ".jpg"), quality=82, optimize=True)
+                    image.thumbnail((480, 480), Image.Resampling.LANCZOS)
+                    image.save(stage / "thumb" / filename, quality=76)
+                    image.convert("RGB").save(stage / "thumb" / (photo_id + ".jpg"), quality=78, optimize=True)
                 known.add(digest)
                 added.append(filename)
             if added:
