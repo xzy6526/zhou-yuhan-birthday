@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState, useEffect, useRef, useMemo } from "react";
+import { lazy, Suspense, useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { motion, AnimatePresence, useMotionValue, useSpring, useReducedMotion } from "framer-motion";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useConfetti } from "./Confetti";
@@ -29,8 +29,27 @@ const BirthdayMessageWall = lazy(() => import("./BirthdayMessageWall"));
 
 export const MainBirthday = () => {
     const [visible, setVisible] = useState(false);
-    const [cakeEntered, setCakeEntered] = useState(false);
+    const cakeRef = useRef<HTMLIFrameElement>(null);
     const [cakeRetry, setCakeRetry] = useState(0);
+    const updateCakeVisibility = useCallback(() => {
+        const frame = cakeRef.current;
+        if (!frame) return;
+        const rect = frame.getBoundingClientRect();
+        frame.contentWindow?.postMessage({
+            type: "birthday-cake-visibility",
+            visible: !document.hidden && rect.bottom > 0 && rect.top < window.innerHeight,
+        }, "*");
+    }, []);
+    useEffect(() => {
+        window.addEventListener("scroll", updateCakeVisibility, { passive: true });
+        window.addEventListener("resize", updateCakeVisibility);
+        document.addEventListener("visibilitychange", updateCakeVisibility);
+        return () => {
+            window.removeEventListener("scroll", updateCakeVisibility);
+            window.removeEventListener("resize", updateCakeVisibility);
+            document.removeEventListener("visibilitychange", updateCakeVisibility);
+        };
+    }, [updateCakeVisibility]);
     const [emojis, setEmojis] = useState<{
         id: number;
         emoji: string;
@@ -239,24 +258,26 @@ export const MainBirthday = () => {
       
 
       {config.showCakeSection && (<section id="cake-section" className="relative z-20 px-4 pb-16 sm:pb-32">
-        <motion.div initial={{ opacity: 0, y: 100 }} whileInView={{ opacity: 1, y: 0 }} onViewportEnter={() => setCakeEntered(true)} viewport={{ once: true, margin: "0px" }} transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }} className="text-center">
+        <div className="text-center">
           {name === "周昱含" ? (
             <div className="h-[clamp(500px,70svh,680px)]">
-              {cakeEntered && <iframe
+              <iframe
+                ref={cakeRef}
+                onLoad={updateCakeVisibility}
                 key={cakeRetry}
-                src={import.meta.env.BASE_URL + "cake/birthday-cake-demo.html?rev=2&retry=" + cakeRetry}
+                src={import.meta.env.BASE_URL + "cake/birthday-cake-demo.html?rev=4&retry=" + cakeRetry}
                 title="周昱含的互动生日蛋糕"
                 loading="eager"
                 sandbox="allow-scripts"
                 className="mx-auto block h-full w-full max-w-5xl rounded-3xl border border-white/15 bg-[#080713] shadow-2xl"
-              />}
+              />
             </div>
           ) : <CakeCutting />}
-          {name === "周昱含" && cakeEntered && <div className="mt-3 flex justify-center gap-5 text-xs text-white/70">
+          {name === "周昱含" && <div className="mt-3 flex justify-center gap-5 text-xs text-white/70">
             <button type="button" className="min-h-10 underline underline-offset-4" onClick={() => setCakeRetry(value => value + 1)}>重新加载蛋糕</button>
-            <a className="inline-flex min-h-10 items-center underline underline-offset-4" href={import.meta.env.BASE_URL + "cake/birthday-cake-demo.html?rev=2"} target="_blank" rel="noreferrer">单独打开蛋糕</a>
+            <a className="inline-flex min-h-10 items-center underline underline-offset-4" href={import.meta.env.BASE_URL + "cake/birthday-cake-demo.html?rev=4"} target="_blank" rel="noreferrer">单独打开蛋糕</a>
           </div>}
-        </motion.div>
+        </div>
       </section>)}
 
       {config.showPhotoSection && (

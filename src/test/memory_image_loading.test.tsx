@@ -2,13 +2,12 @@ import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, expect, it, vi } from "vitest";
 import BirthdayMemoryAlbum from "@/components/birthday/BirthdayMemoryAlbum";
 
-vi.mock("framer-motion", () => ({ useInView: () => true }));
 afterEach(() => {
     cleanup();
     vi.unstubAllGlobals();
 });
 
-it("starts nearby images explicitly, falls back after failure and resets failed images on retry", () => {
+it("loads images when visibility observers stay silent, falls back after failure and resets on retry", () => {
     vi.stubGlobal("IntersectionObserver", class {
         observe() {}
         disconnect() {}

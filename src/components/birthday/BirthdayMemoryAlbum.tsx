@@ -1,6 +1,5 @@
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, Pause, Play, X } from "lucide-react";
-import { useInView } from "framer-motion";
 import type { ImgHTMLAttributes } from "react";
 import type { MemoryAlbumData } from "@/config/localMemoryAlbum";
 import "./BirthdayMemoryAlbum.css";
@@ -9,10 +8,8 @@ const asset = (id: string, thumbnail = false) =>
     `${import.meta.env.BASE_URL}memories/${thumbnail ? "thumb/" : ""}${id}.jpg`;
 
 const MemoryImage = ({ id, thumbnail = false, ...props }: ImgHTMLAttributes<HTMLImageElement> & { id: string; thumbnail?: boolean }) => {
-    const ref = useRef<HTMLImageElement>(null);
-    const near = useInView(ref, { once: true, margin: "500px" });
     return (
-        <img {...props} ref={ref} src={!thumbnail || near ? asset(id, thumbnail) : undefined} loading="eager" decoding="async"
+        <img {...props} src={asset(id, thumbnail)} loading="eager" decoding="async"
             onError={event => {
                 const img = event.currentTarget;
                 if (!img.dataset.fallback) {
