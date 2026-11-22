@@ -546,6 +546,7 @@ try {
     cake.flame.traverse(object=>{object.visible=lit;});cake.flameGlow.visible=lit;cake.candleLight.visible=true;cake.candleLight.intensity=lit?5.1:0;
     cake.dirty = true;
     cake.draw();
+    requestAnimationFrame(()=>cake.renderer.render(cake.scene,cake.camera));
     wishButton.textContent = lit ? '许愿后，吹灭蜡烛' : '再点亮蜡烛';
     wishNote.textContent = lit ? '' : '愿望交给星星啦。周昱含，生日快乐！';
   });
