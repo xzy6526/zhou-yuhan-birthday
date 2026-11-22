@@ -7,9 +7,9 @@ import "./BirthdayMemoryAlbum.css";
 const asset = (id: string, thumbnail = false) =>
     `${import.meta.env.BASE_URL}memories/${thumbnail ? "thumb/" : ""}${id}.webp`;
 
-const MemoryImage = ({ id, thumbnail = false, ...props }: ImgHTMLAttributes<HTMLImageElement> & { id: string; thumbnail?: boolean }) => {
+const MemoryImage = ({ id, thumbnail = false, deferred = false, ...props }: ImgHTMLAttributes<HTMLImageElement> & { id: string; thumbnail?: boolean; deferred?: boolean }) => {
     return (
-        <img {...props} src={asset(id, thumbnail)} loading={thumbnail ? "lazy" : "eager"} decoding="async"
+        <img {...props} src={deferred ? undefined : asset(id, thumbnail)} data-memory-src={deferred ? asset(id, thumbnail) : undefined} loading="eager" decoding="async"
             onError={event => {
                 const img = event.currentTarget;
                 if (!img.dataset.fallback) {
@@ -91,6 +91,7 @@ const AlbumGrid = memo(function AlbumGrid({ album, onOpen }: { album: MemoryAlbu
                                         <MemoryImage
                                             id={photo.id}
                                             thumbnail
+                                            deferred
                                             alt=""
                                             width={photo.width}
                                             height={photo.height}
@@ -108,9 +109,36 @@ const AlbumGrid = memo(function AlbumGrid({ album, onOpen }: { album: MemoryAlbu
 });
 
 const BirthdayMemoryAlbum = ({ album }: { album: MemoryAlbumData }) => {
+    const albumRef = useRef<HTMLElement>(null);
     const dialogRef = useRef<HTMLDialogElement>(null);
     const [current, setCurrent] = useState<number | null>(null);
     const [retry, setRetry] = useState(0);
+    useEffect(() => {
+        let scheduled = 0;
+        const loadNearby = () => {
+            scheduled = 0;
+            const pending = albumRef.current?.querySelectorAll<HTMLImageElement>("img[data-memory-src]");
+            const nearby = Array.from(pending || []).filter(image => {
+                const rect = image.getBoundingClientRect();
+                return rect.width > 0 && rect.top < window.innerHeight + 500 && rect.bottom > -500;
+            });
+            nearby.forEach(image => {
+                image.src = image.dataset.memorySrc!;
+                image.removeAttribute("data-memory-src");
+            });
+        };
+        const schedule = () => {
+            if (!scheduled) scheduled = window.requestAnimationFrame(loadNearby);
+        };
+        schedule();
+        window.addEventListener("scroll", schedule, { passive: true });
+        window.addEventListener("resize", schedule);
+        return () => {
+            window.cancelAnimationFrame(scheduled);
+            window.removeEventListener("scroll", schedule);
+            window.removeEventListener("resize", schedule);
+        };
+    }, [retry, album]);
     const photos = useMemo(() => album.groups.flatMap(group => group.photos), [album.groups]);
     const openPhoto = useCallback((index: number) => {
         setCurrent(index);
@@ -123,7 +151,7 @@ const BirthdayMemoryAlbum = ({ album }: { album: MemoryAlbumData }) => {
     };
 
     return (
-        <section id="memories" className="memory-album relative z-20 mx-auto max-w-6xl px-4 py-16 sm:px-8" aria-labelledby="memory-album-title">
+        <section ref={albumRef} id="memories" className="memory-album relative z-20 mx-auto max-w-6xl px-4 py-16 sm:px-8" aria-labelledby="memory-album-title">
             <header className="memory-album__intro">
                 <h2 id="memory-album-title">照片里的日子</h2>
                 <a href="#memory-photos">浏览全部 {photos.length} 张 <span aria-hidden="true">↓</span></a>

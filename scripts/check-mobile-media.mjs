@@ -6,6 +6,10 @@ for (const engine of [chromium, webkit]) {
     const browser = await engine.launch(engine === chromium ? { channel: "msedge" } : {});
     try {
         const page = await browser.newPage({ viewport: { width: 402, height: 800 }, isMobile: true, hasTouch: true });
+        const photoRequests = new Set();
+        page.on("request", request => {
+            if (request.url().includes("/memories/")) photoRequests.add(request.url());
+        });
         await page.addInitScript(() => {
             window.IntersectionObserver = class {
                 observe() {}
@@ -17,6 +21,11 @@ for (const engine of [chromium, webkit]) {
         await page.goto(url);
         const frame = page.frameLocator('iframe[title*="蛋糕"]');
         await frame.locator("body.ready").waitFor();
+        await page.locator(".memory-album__grid").first().waitFor();
+        assert.equal(await page.locator(".memory-album__grid img").last().getAttribute("src"), null,
+            "Offscreen photos must not download before scrolling, even without native lazy loading");
+        assert.ok(photoRequests.size < 40, "The initial page must not request the entire album");
+        console.log(engine.name() + " initial unique photo requests: " + photoRequests.size);
         const painted = () => frame.locator("#cake-canvas").evaluate(canvas =>
             canvas.getContext("2d").getImageData(0, 0, canvas.width, canvas.height).data
                 .some((value, i) => i % 4 === 3 && value > 0));
@@ -38,6 +47,13 @@ for (const engine of [chromium, webkit]) {
             await page.locator("dialog[open] img").evaluate(image => image.decode());
             await page.keyboard.press("Escape");
         }
+        const lastPhoto = page.locator(".memory-album__grid img").last();
+        await lastPhoto.scrollIntoViewIfNeeded();
+        await lastPhoto.evaluate(image => new Promise((resolve, reject) => {
+            if (image.complete && image.naturalWidth) return resolve();
+            image.onload = resolve;
+            image.onerror = reject;
+        }));
         console.log(engine.name() + " passed: observer silence, zero width, candle and photos");
     } finally {
         await browser.close();
