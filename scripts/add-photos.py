@@ -64,17 +64,20 @@ def add_photos(root, sources, group_title):
                     image.info.clear()
                     image.thumbnail((1920, 1920), Image.Resampling.LANCZOS)
                     image.save(stage / filename, quality=86)
+                    image.convert("RGB").save(stage / (photo_id + ".jpg"), quality=87, optimize=True)
                     groups[group_title]["photos"].append(dict(id=photo_id, width=image.width, height=image.height, sourceSha256=digest))
                     image.thumbnail((640, 640), Image.Resampling.LANCZOS)
                     image.save(stage / "thumb" / filename, quality=80)
+                    image.convert("RGB").save(stage / "thumb" / (photo_id + ".jpg"), quality=82, optimize=True)
                 known.add(digest)
                 added.append(filename)
             if added:
                 updated = stage / "album.json"
                 updated.write_text(json.dumps(album, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
                 for filename in added:
-                    for path in (Path(filename), Path("thumb") / filename):
-                        (stage / path).replace(images / path)
+                    for variant in (filename, Path(filename).with_suffix(".jpg").name):
+                        for path in (Path(variant), Path("thumb") / variant):
+                            (stage / path).replace(images / path)
                 updated.replace(manifest)
             return len(added), len(files) - len(added)
 

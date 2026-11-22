@@ -29,6 +29,15 @@
     color: white;
     text-decoration: underline;
 }
+.memory-album__retry {
+    min-height: 40px;
+    color: var(--memory-muted);
+    font: inherit;
+    font-size: .8rem;
+    text-decoration: underline;
+    text-underline-offset: .25em;
+    cursor: pointer;
+}
 
 .memory-wall {
     background: radial-gradient(ellipse at 47% 55%, #39214c 0%, #160f25 75%);

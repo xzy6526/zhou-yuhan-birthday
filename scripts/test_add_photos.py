@@ -35,9 +35,10 @@ class PhotoImportTest(unittest.TestCase):
             photo, = json.loads(manifest.read_text(encoding="utf-8"))["groups"][0]["photos"]
             filename = photo["id"] + ".webp"
             for path, size in [(media / filename, (960, 1920)), (media / "thumb" / filename, (320, 640))]:
-                with Image.open(path) as image:
-                    self.assertEqual(image.size, size)
-                    self.assertFalse(image.getexif())
+                for variant in (path, path.with_suffix(".jpg")):
+                    with Image.open(variant) as image:
+                        self.assertEqual(image.size, size)
+                        self.assertFalse(image.getexif())
 
 
 if __name__ == "__main__":

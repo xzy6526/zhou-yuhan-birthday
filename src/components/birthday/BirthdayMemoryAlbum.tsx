@@ -1,10 +1,30 @@
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, Pause, Play, X } from "lucide-react";
+import { useInView } from "framer-motion";
+import type { ImgHTMLAttributes } from "react";
 import type { MemoryAlbumData } from "@/config/localMemoryAlbum";
 import "./BirthdayMemoryAlbum.css";
 
 const asset = (id: string, thumbnail = false) =>
-    `${import.meta.env.BASE_URL}memories/${thumbnail ? "thumb/" : ""}${id}.webp`;
+    `${import.meta.env.BASE_URL}memories/${thumbnail ? "thumb/" : ""}${id}.jpg`;
+
+const MemoryImage = ({ id, thumbnail = false, ...props }: ImgHTMLAttributes<HTMLImageElement> & { id: string; thumbnail?: boolean }) => {
+    const ref = useRef<HTMLImageElement>(null);
+    const near = useInView(ref, { once: true, margin: "500px" });
+    return (
+        <img {...props} ref={ref} src={!thumbnail || near ? asset(id, thumbnail) : undefined} loading="eager" decoding="async"
+            onError={event => {
+                const img = event.currentTarget;
+                if (!img.dataset.fallback) {
+                    img.dataset.fallback = "true";
+                    img.src = asset(id, thumbnail).replace(/\.jpg$/, ".webp");
+                } else {
+                    img.alt = "照片加载失败，请点重新加载照片";
+                }
+            }}
+        />
+    );
+};
 
 const MemoryWall = ({ featured }: { featured: string[] }) => {
     const wallRef = useRef<HTMLDivElement>(null);
@@ -32,7 +52,7 @@ const MemoryWall = ({ featured }: { featured: string[] }) => {
                             {[0, 1].map(copy => (
                                 <div className="memory-wall__tiles" key={copy}>
                                     {lane.map(id => (
-                                        <img key={id} src={asset(id, true)} alt="" loading="lazy" decoding="async" />
+                                        <MemoryImage key={id} id={id} thumbnail alt="" />
                                     ))}
                                 </div>
                             ))}
@@ -71,13 +91,12 @@ const AlbumGrid = memo(function AlbumGrid({ album, onOpen }: { album: MemoryAlbu
                                         aria-label={`查看${group.title}第${i + 1}张照片`}
                                         onClick={() => onOpen(start + i)}
                                     >
-                                        <img
-                                            src={asset(photo.id, true)}
+                                        <MemoryImage
+                                            id={photo.id}
+                                            thumbnail
                                             alt=""
                                             width={photo.width}
                                             height={photo.height}
-                                            loading="lazy"
-                                            decoding="async"
                                         />
                                     </button>
                                     {photo.caption && <figcaption>{photo.caption}</figcaption>}
@@ -94,6 +113,7 @@ const AlbumGrid = memo(function AlbumGrid({ album, onOpen }: { album: MemoryAlbu
 const BirthdayMemoryAlbum = ({ album }: { album: MemoryAlbumData }) => {
     const dialogRef = useRef<HTMLDialogElement>(null);
     const [current, setCurrent] = useState<number | null>(null);
+    const [retry, setRetry] = useState(0);
     const photos = useMemo(() => album.groups.flatMap(group => group.photos), [album.groups]);
     const openPhoto = useCallback((index: number) => {
         setCurrent(index);
@@ -110,11 +130,12 @@ const BirthdayMemoryAlbum = ({ album }: { album: MemoryAlbumData }) => {
             <header className="memory-album__intro">
                 <h2 id="memory-album-title">照片里的日子</h2>
                 <a href="#memory-photos">浏览全部 {photos.length} 张 <span aria-hidden="true">↓</span></a>
+                <button type="button" className="memory-album__retry" onClick={() => setRetry(value => value + 1)}>重新加载照片</button>
             </header>
 
-            <MemoryWall featured={album.featured} />
+            <MemoryWall key={`wall-${retry}`} featured={album.featured} />
 
-            <AlbumGrid album={album} onOpen={openPhoto} />
+            <AlbumGrid key={retry} album={album} onOpen={openPhoto} />
 
             <dialog
                 ref={dialogRef}
@@ -135,9 +156,10 @@ const BirthdayMemoryAlbum = ({ album }: { album: MemoryAlbumData }) => {
                         <button type="button" className="memory-viewer__close" aria-label="关闭大图" onClick={() => dialogRef.current?.close()}>
                             <X size={20} aria-hidden="true" />
                         </button>
-                        <img
+                        <MemoryImage
+                            key={`${active.id}-${retry}`}
+                            id={active.id}
                             className="memory-viewer__photo"
-                            src={asset(active.id)}
                             alt={active.caption || `回忆照片 ${current + 1}`}
                             width={active.width}
                             height={active.height}
